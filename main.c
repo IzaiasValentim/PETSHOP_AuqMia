@@ -29,10 +29,10 @@ int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
 Hash *criaHash(int TABLE_SIZE);
-int chaveDivisao (int chave, int TABLE_SIZE);
+int chaveDivisao(int chave, int TABLE_SIZE);
 int chaveTabelaPeloUsername(char *str);
 int insereHash_SemColisao(Hash *ha, Usuario usuario);
-int buscaHash(Hash* ha, char * nome, Usuario *usuario);
+int buscaHash(Hash *ha, char *nome, Usuario *usuario);
 void liberarHash(Hash *ha);
 
 int main()
@@ -265,8 +265,9 @@ Hash *criaHash(int TABLE_SIZE)
     return ha;
 }
 
-int chaveDivisao (int chave, int TABLE_SIZE) {
-return (chave & 0x7FFFFFFF) % TABLE_SIZE;
+int chaveDivisao(int chave, int TABLE_SIZE)
+{
+    return (chave & 0x7FFFFFFF) % TABLE_SIZE;
 }
 
 int chaveTabelaPeloNome(char *str)
@@ -275,6 +276,23 @@ int chaveTabelaPeloNome(char *str)
     int tam = strlen(str);
     for (i = 0; i < tam; i++)
         valor = 31 * valor + (int)str[i];
-    
+
     return valor;
+}
+
+int inserirUsuario(Hash *ha, Usuario usuario)
+{
+    if (ha == NULL || ha->quantidade == ha->TAM_TAB)
+        return 0;
+
+    int chave = chaveTabelaPeloNome(usuario.username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+    Usuario *novo;
+    novo = (Usuario *)malloc(sizeof(Usuario));
+    if (novo == NULL)
+        return 0;
+    *novo = usuario;
+    ha->usuarios[pos] = novo;
+    ha->quantidade++;
+    return 1;
 }
