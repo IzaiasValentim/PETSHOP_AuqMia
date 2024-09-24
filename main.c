@@ -309,3 +309,20 @@ int buscaUsuarioPorUsername(Hash* ha, char * username, Usuario *usuario){
     *usuario = *(ha->usuarios[pos]);
     return 1;
 }
+
+void liberarHash(Hash *ha)
+{
+    if (ha != NULL)
+    {
+        int i;
+        for (i = 0; i < ha->TAM_TAB; i++)
+        {
+            if (ha->usuarios[i] != NULL)
+            {
+                free(ha->usuarios[i]);
+            }
+        }
+        free(ha->usuarios);
+        free(ha);
+    }
+}
