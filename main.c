@@ -12,6 +12,7 @@ typedef struct
     int veterinario;
     int tosador;
     int gerente;
+    struct Usuario *prox;
 } Usuario;
 
 typedef struct hash
@@ -30,9 +31,9 @@ int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
 // Funções iniciais do Hash
 Hash *criaHash(int TABLE_SIZE);
 int chaveDivisao(int chave, int TABLE_SIZE);
-int chaveTabelaPeloUsername(char *str);
-int insereHash_SemColisao(Hash *ha, Usuario usuario);
-int buscaHash(Hash *ha, char *nome, Usuario *usuario);
+int chaveTabelaPorUsername(char *str);
+int inserirUsuario(Hash *ha, Usuario usuario);
+int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
 void liberarHash(Hash *ha);
 
 int main()
@@ -40,13 +41,19 @@ int main()
     SetConsoleOutputCP(CP_UTF8);
     // Lista de usuários cadastrados (para exemplo)
     Usuario usuarios[] = {
-        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0},
-        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0},
-        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0},
-        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1}};
-    int totalUsuarios = 4;
-    Usuario usuarioLogado;
+        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL},
+        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0, NULL},
+        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0, NULL},
+        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL}};
+    int totalUsuarios = 11;
 
+    Hash *Usuarios = criaHash(totalUsuarios);
+    inserirUsuario(Usuarios, usuarios[0]);
+    inserirUsuario(Usuarios, usuarios[1]);
+    inserirUsuario(Usuarios, usuarios[2]);
+    inserirUsuario(Usuarios, usuarios[3]);
+    Usuario usuarioLogado;
+    
     int continuar = 1; // Variável para controlar o loop do sistema
 
     // Loop principal do sistema
@@ -287,27 +294,36 @@ int inserirUsuario(Hash *ha, Usuario usuario)
 
     int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
-    Usuario *novo;
-    novo = (Usuario *)malloc(sizeof(Usuario));
+
+    Usuario *novo = (Usuario *)malloc(sizeof(Usuario));
     if (novo == NULL)
         return 0;
     *novo = usuario;
+    novo->prox = ha->usuarios[pos];
     ha->usuarios[pos] = novo;
     ha->quantidade++;
     return 1;
 }
 
-int buscaUsuarioPorUsername(Hash* ha, char * username, Usuario *usuario){
-    if(ha == NULL){
+int buscaUsuarioPorUsername(Hash *ha, char *username, Usuario *usuario)
+{
+    if (ha == NULL)
         return 0;
-    }
+
     int chave = chaveTabelaPorUsername(username);
-    int pos = chaveDivisao (chave,ha->TAM_TAB);
-    if(ha->usuarios[pos] == NULL){
-        return 0;
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos];
+    while (atual != NULL)
+    {
+        if (strcmp(atual->username, username) == 0)
+        {
+            *usuario = *atual;
+            return 1;
+        }
+        atual = atual->prox;
     }
-    *usuario = *(ha->usuarios[pos]);
-    return 1;
+    return 0;
 }
 
 void liberarHash(Hash *ha)
