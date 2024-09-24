@@ -36,6 +36,24 @@ int inserirUsuario(Hash *ha, Usuario usuario);
 int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
 void liberarHash(Hash *ha);
 
+// Função apenas para fins de desenvolvimento, remover antes da entrega.
+void exibeUsuarios(Hash *ha) {
+    for (int i = 0; i < ha->TAM_TAB; i++) {
+        printf("Posição %d:\n", i);
+        Usuario *atual = ha->usuarios[i];  // Pega o primeiro usuário na posição i
+        
+        if (atual == NULL) {
+            printf("  [Vazio]\n");
+        } else {
+            // Percorre a lista encadeada de usuários na posição i
+            while (atual != NULL) {
+                printf("  Usuário: %s, Email: %s\n", atual->username, atual->email);
+                atual = atual->prox;  // Avança para o próximo usuário na lista encadeada
+            }
+        }
+    }
+}
+
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
@@ -44,7 +62,12 @@ int main()
         {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL},
         {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0, NULL},
         {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0, NULL},
+        {"izaias@petshop.com", "Luis Izaias", "12345", 0, 0, 1, 0, NULL},
+        {"izaias2@petshop.com", "Izaias Luis", "12345", 0, 0, 1, 0, NULL},
+        {"Tulio@petshop.com", "Tulio", "12345", 0, 0, 1, 0, NULL},
+        {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL},
         {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL}};
+        
     int totalUsuarios = 11;
 
     Hash *Usuarios = criaHash(totalUsuarios);
@@ -52,8 +75,13 @@ int main()
     inserirUsuario(Usuarios, usuarios[1]);
     inserirUsuario(Usuarios, usuarios[2]);
     inserirUsuario(Usuarios, usuarios[3]);
+    inserirUsuario(Usuarios, usuarios[4]);
+    inserirUsuario(Usuarios, usuarios[5]);
+    inserirUsuario(Usuarios, usuarios[6]);
+    inserirUsuario(Usuarios, usuarios[7]);
+
     Usuario usuarioLogado;
-    
+
     int continuar = 1; // Variável para controlar o loop do sistema
 
     // Loop principal do sistema
