@@ -270,7 +270,7 @@ int chaveDivisao(int chave, int TABLE_SIZE)
     return (chave & 0x7FFFFFFF) % TABLE_SIZE;
 }
 
-int chaveTabelaPeloNome(char *str)
+int chaveTabelaPorUsername(char *str)
 {
     int i, valor = 7;
     int tam = strlen(str);
@@ -285,7 +285,7 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     if (ha == NULL || ha->quantidade == ha->TAM_TAB)
         return 0;
 
-    int chave = chaveTabelaPeloNome(usuario.username);
+    int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
     Usuario *novo;
     novo = (Usuario *)malloc(sizeof(Usuario));
@@ -294,5 +294,18 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     *novo = usuario;
     ha->usuarios[pos] = novo;
     ha->quantidade++;
+    return 1;
+}
+
+int buscaUsuarioPorUsername(Hash* ha, char * username, Usuario *usuario){
+    if(ha == NULL){
+        return 0;
+    }
+    int chave = chaveTabelaPorUsername(username);
+    int pos = chaveDivisao (chave,ha->TAM_TAB);
+    if(ha->usuarios[pos] == NULL){
+        return 0;
+    }
+    *usuario = *(ha->usuarios[pos]);
     return 1;
 }
