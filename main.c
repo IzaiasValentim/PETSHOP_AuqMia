@@ -14,6 +14,12 @@ typedef struct
     int gerente;
 } Usuario;
 
+typedef struct hash
+{
+    int quantidade, TAM_TAB;
+    Usuario **usuarios;
+} Hash;
+
 void boasVindas();
 void menuVendedor();
 void menuVeterinario();
@@ -21,6 +27,13 @@ void menuTosador();
 void menuGerente();
 int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
 
+// Funções iniciais do Hash
+Hash *criaHash(int TABLE_SIZE);
+int chaveDivisao (int chave, int TABLE_SIZE);
+int chaveTabelaPeloUsername(char *str);
+int insereHash_SemColisao(Hash *ha, Usuario usuario);
+int buscaHash(Hash* ha, char * nome, Usuario *usuario);
+void liberarHash(Hash *ha);
 
 int main()
 {
