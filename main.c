@@ -264,3 +264,17 @@ Hash *criaHash(int TABLE_SIZE)
     }
     return ha;
 }
+
+int chaveDivisao (int chave, int TABLE_SIZE) {
+return (chave & 0x7FFFFFFF) % TABLE_SIZE;
+}
+
+int chaveTabelaPeloNome(char *str)
+{
+    int i, valor = 7;
+    int tam = strlen(str);
+    for (i = 0; i < tam; i++)
+        valor = 31 * valor + (int)str[i];
+    
+    return valor;
+}
