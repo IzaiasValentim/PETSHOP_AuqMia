@@ -242,3 +242,25 @@ int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado)
     }
     return 0; // Falha no login
 }
+
+// Funções tabela Hash:
+Hash *criaHash(int TABLE_SIZE)
+{
+    Hash *ha = (Hash *)malloc(sizeof(Hash));
+    if (ha != NULL)
+    {
+        int i;
+        ha->TAM_TAB = TABLE_SIZE;
+        ha->usuarios = (Usuario **)malloc(
+            TABLE_SIZE * sizeof(Usuario *));
+        if (ha->usuarios == NULL)
+        {
+            free(ha);
+            return NULL;
+        }
+        ha->quantidade = 0;
+        for (i = 0; i < ha->TAM_TAB; i++)
+            ha->usuarios[i] = NULL;
+    }
+    return ha;
+}
