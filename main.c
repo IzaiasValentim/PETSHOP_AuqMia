@@ -14,6 +14,73 @@ typedef struct
     int gerente;
 } Usuario;
 
+void boasVindas();
+void menuVendedor();
+void menuVeterinario();
+void menuTosador();
+void menuGerente();
+int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
+
+
+int main()
+{
+    SetConsoleOutputCP(CP_UTF8);
+    // Lista de usuários cadastrados (para exemplo)
+    Usuario usuarios[] = {
+        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0},
+        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0},
+        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0},
+        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1}};
+    int totalUsuarios = 4;
+    Usuario usuarioLogado;
+
+    int continuar = 1; // Variável para controlar o loop do sistema
+
+    // Loop principal do sistema
+    while (continuar)
+    {
+        boasVindas();
+        // Processo de login
+        if (login(usuarios, totalUsuarios, &usuarioLogado))
+        {
+            printf("\nLogin bem-sucedido!\n");
+
+            // Verifica o tipo de usuário e exibe o menu correspondente
+            if (usuarioLogado.vendedor)
+            {
+                menuVendedor();
+            }
+            else if (usuarioLogado.veterinario)
+            {
+                menuVeterinario();
+            }
+            else if (usuarioLogado.tosador)
+            {
+                menuTosador();
+            }
+            else if (usuarioLogado.gerente)
+            {
+                menuGerente();
+            }
+            else
+            {
+                printf("Usuario invalido, confira suas credenciais.\n");
+            }
+        }
+        else
+        {
+            printf("\nEmail ou senha incorretos!\n");
+        }
+
+        // Pergunta se o usuário deseja continuar ou sair do sistema
+        printf("\nDeseja continuar no sistema? (1 - Sim / 0 - Nao): ");
+        scanf("%d", &continuar);
+    }
+
+    printf("Obrigado por usar o sistema Pet Shop. Até mais!\n");
+    return 0;
+}
+
 void boasVindas()
 {
     Sleep(1000);
@@ -28,7 +95,6 @@ void boasVindas()
     printf("====      Realize o login :      ====\n\n");
 }
 
-// Funções para exibir os menus específicos de cada tipo de usuário
 void menuVendedor()
 {
     int opcao;
@@ -162,63 +228,4 @@ int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado)
         }
     }
     return 0; // Falha no login
-}
-
-int main()
-{
-    SetConsoleOutputCP(CP_UTF8);
-    // Lista de usuários cadastrados (para exemplo)
-    Usuario usuarios[] = {
-        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0},
-        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0},
-        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0},
-        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1}};
-    int totalUsuarios = 4;
-    Usuario usuarioLogado;
-
-    int continuar = 1; // Variável para controlar o loop do sistema
-
-    // Loop principal do sistema
-    while (continuar)
-    {
-        boasVindas();
-        // Processo de login
-        if (login(usuarios, totalUsuarios, &usuarioLogado))
-        {
-            printf("\nLogin bem-sucedido!\n");
-
-            // Verifica o tipo de usuário e exibe o menu correspondente
-            if (usuarioLogado.vendedor)
-            {
-                menuVendedor();
-            }
-            else if (usuarioLogado.veterinario)
-            {
-                menuVeterinario();
-            }
-            else if (usuarioLogado.tosador)
-            {
-                menuTosador();
-            }
-            else if (usuarioLogado.gerente)
-            {
-                menuGerente();
-            }
-            else
-            {
-                printf("Usuario invalido, confira suas credenciais.\n");
-            }
-        }
-        else
-        {
-            printf("\nEmail ou senha incorretos!\n");
-        }
-
-        // Pergunta se o usuário deseja continuar ou sair do sistema
-        printf("\nDeseja continuar no sistema? (1 - Sim / 0 - Nao): ");
-        scanf("%d", &continuar);
-    }
-
-    printf("Obrigado por usar o sistema Pet Shop. Até mais!\n");
-    return 0;
 }
