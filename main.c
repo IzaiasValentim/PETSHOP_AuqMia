@@ -41,7 +41,8 @@ int cadastrarUsuario(Hash *ha);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha) {
-    for (int i = 0; i < ha->TAM_TAB; i++) {
+    int i;
+    for (i = 0; i < ha->TAM_TAB; i++) {
         printf("Posição %d:\n", i);
         Usuario *atual = ha->usuarios[i];  // Pega o primeiro usuário na posição i
         
@@ -281,7 +282,8 @@ int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado)
     scanf("%s", senha);
 
     // Verifica se o usuário está na lista de usuários
-    for (int i = 0; i < totalUsuarios; i++)
+    int i;
+    for (i = 0; i < totalUsuarios; i++)
     {
         if (strcmp(usuarios[i].email, email) == 0 && strcmp(usuarios[i].senha, senha) == 0)
         {
