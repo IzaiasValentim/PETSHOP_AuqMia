@@ -5,7 +5,8 @@
 // Estrutura para armazenar os dados do usuário
 typedef struct
 {
-    char email[50];
+
+    char email[50]; 
     char username[50];
     char senha[20];
     int vendedor;
