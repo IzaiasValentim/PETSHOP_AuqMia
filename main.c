@@ -37,7 +37,7 @@ int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
 void liberarHash(Hash *ha);
 
 // Funções CRUD Usuário:
-int cadastrarUsuário(Hash *ha);
+int cadastrarUsuario(Hash *ha);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha) {
@@ -249,9 +249,13 @@ void menuGerente(Hash *usuarios)
             printf("-> Gerenciar Funcionários\n");
             printf("1. Cadastrar Usuário\n");
             printf("2. Deletar Usuário\n");
+            printf("5. voltar\n");
             scanf("%d", &opcao);
             if(opcao == 1){
-                cadastrarUsuário(usuarios);
+                cadastrarUsuario(usuarios);
+            }else if(opcao == 5){
+                opcao = 0;
+                break;
             }
             break;
         case 2:
@@ -381,6 +385,37 @@ void liberarHash(Hash *ha)
     }
 }
 
-int cadastrarUsuário(Hash *ha){
+int cadastrarUsuario(Hash *ha)
+{
+    Usuario novoUsuario;
+    printf("Digite o email: ");
+    scanf("%s", novoUsuario.email);
+    
+    printf("Digite o username: ");
+    scanf("%s", novoUsuario.username);
 
+    printf("Digite a senha: ");
+    scanf("%s", novoUsuario.senha);
+
+    printf("O usuário eh (1 para sim, 0 para não):\n");
+    printf("Vendedor: ");
+    scanf("%d", &novoUsuario.vendedor);
+    printf("Veterinario: ");
+    scanf("%d", &novoUsuario.veterinario);
+    printf("Tosador: ");
+    scanf("%d", &novoUsuario.tosador);
+    printf("Gerente: ");
+    scanf("%d", &novoUsuario.gerente);
+    novoUsuario.prox = NULL;
+
+    if (inserirUsuario(ha, novoUsuario))
+    {
+        printf("%s cadastrado com sucesso!\n", novoUsuario.username);
+        return 1;
+    }
+    else
+    {
+        printf("Erro ao cadastrar novo usuário!\n");
+        return 0;
+    }
 }
