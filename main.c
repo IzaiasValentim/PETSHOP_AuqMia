@@ -25,7 +25,7 @@ void boasVindas();
 void menuVendedor();
 void menuVeterinario();
 void menuTosador();
-void menuGerente();
+void menuGerente(Hash *usuarios);
 int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
@@ -35,6 +35,9 @@ int chaveTabelaPorUsername(char *str);
 int inserirUsuario(Hash *ha, Usuario usuario);
 int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
 void liberarHash(Hash *ha);
+
+// Funções CRUD Usuário:
+int cadastrarUsuário(Hash *ha);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha) {
@@ -108,7 +111,7 @@ int main()
             }
             else if (usuarioLogado.gerente)
             {
-                menuGerente();
+                menuGerente(Usuarios);
             }
             else
             {
@@ -226,7 +229,7 @@ void menuTosador()
     } while (opcao != 2);
 }
 
-void menuGerente()
+void menuGerente(Hash *usuarios)
 {
     int opcao;
     do
@@ -242,7 +245,14 @@ void menuGerente()
         {
         case 1:
             printf("Gerenciando funcionários...\n");
-            // Lógica para gerenciar funcionários
+            opcao = 0;
+            printf("-> Gerenciar Funcionários\n");
+            printf("1. Cadastrar Usuário\n");
+            printf("2. Deletar Usuário\n");
+            scanf("%d", &opcao);
+            if(opcao == 1){
+                cadastrarUsuário(usuarios);
+            }
             break;
         case 2:
             printf("Visualizando relatórios...\n");
@@ -369,4 +379,8 @@ void liberarHash(Hash *ha)
         free(ha->usuarios);
         free(ha);
     }
+}
+
+int cadastrarUsuário(Hash *ha){
+
 }
