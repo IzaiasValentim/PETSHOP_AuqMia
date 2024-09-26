@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <windows.h>
 
 // Estrutura para armazenar os dados do usuário
-typedef struct
+typedef struct Usuario
 {
     char email[50];
     char username[50];
@@ -25,7 +26,7 @@ void boasVindas();
 void menuVendedor();
 void menuVeterinario();
 void menuTosador();
-void menuGerente(Hash *usuarios);
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
 int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
@@ -38,6 +39,7 @@ void liberarHash(Hash *ha);
 
 // Funções CRUD Usuário:
 int cadastrarUsuario(Hash *ha);
+int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha) {
@@ -111,7 +113,7 @@ int main()
             }
             else if (usuarioLogado.gerente)
             {
-                menuGerente(Usuarios);
+                menuGerente(Usuarios, &usuarioLogado);
             }
             else
             {
@@ -229,7 +231,7 @@ void menuTosador()
     } while (opcao != 2);
 }
 
-void menuGerente(Hash *usuarios)
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
 {
     int opcao;
     do
@@ -251,9 +253,11 @@ void menuGerente(Hash *usuarios)
             printf("2. Deletar Usuário\n");
             printf("5. voltar\n");
             scanf("%d", &opcao);
-            if(opcao == 1){
+            if (opcao == 1) {
                 cadastrarUsuario(usuarios);
-            }else if(opcao == 5){
+            } else if (opcao == 2) {
+                deletarUsuario(usuarios, gerenteLogado); // Chama a função de exclusão
+            } else if (opcao == 5) {
                 opcao = 0;
                 break;
             }
@@ -271,28 +275,28 @@ void menuGerente(Hash *usuarios)
     } while (opcao != 3);
 }
 
-// Função para realizar login
+// Função de login
 int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado)
 {
     char email[50], senha[20];
-    printf("Digite seu email: ");
+
+    printf("Email: ");
     scanf("%s", email);
-    printf("Digite sua senha: ");
+    printf("Senha: ");
     scanf("%s", senha);
 
-    // Verifica se o usuário está na lista de usuários
     for (int i = 0; i < totalUsuarios; i++)
     {
         if (strcmp(usuarios[i].email, email) == 0 && strcmp(usuarios[i].senha, senha) == 0)
         {
-            *usuarioLogado = usuarios[i];
-            return 1; // Login bem-sucedido
+            *usuarioLogado = usuarios[i]; // Preenche o usuário logado
+            return 1;                     // Login bem-sucedido
         }
     }
     return 0; // Falha no login
 }
 
-// Funções tabela Hash:
+// Implementação de hash para usuários
 Hash *criaHash(int TABLE_SIZE)
 {
     Hash *ha = (Hash *)malloc(sizeof(Hash));
@@ -300,8 +304,7 @@ Hash *criaHash(int TABLE_SIZE)
     {
         int i;
         ha->TAM_TAB = TABLE_SIZE;
-        ha->usuarios = (Usuario **)malloc(
-            TABLE_SIZE * sizeof(Usuario *));
+        ha->usuarios = (Usuario **)malloc(TABLE_SIZE * sizeof(Usuario *));
         if (ha->usuarios == NULL)
         {
             free(ha);
@@ -325,7 +328,6 @@ int chaveTabelaPorUsername(char *str)
     int tam = strlen(str);
     for (i = 0; i < tam; i++)
         valor = 31 * valor + (int)str[i];
-
     return valor;
 }
 
@@ -340,6 +342,7 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     Usuario *novo = (Usuario *)malloc(sizeof(Usuario));
     if (novo == NULL)
         return 0;
+
     *novo = usuario;
     novo->prox = ha->usuarios[pos];
     ha->usuarios[pos] = novo;
@@ -347,25 +350,26 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     return 1;
 }
 
-int buscaUsuarioPorUsername(Hash *ha, char *username, Usuario *usuario)
+int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario)
 {
     if (ha == NULL)
         return 0;
 
-    int chave = chaveTabelaPorUsername(username);
+    int chave = chaveTabelaPorUsername(nome);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
 
     Usuario *atual = ha->usuarios[pos];
-    while (atual != NULL)
+
+    while (atual != NULL && strcmp(atual->username, nome) != 0)
     {
-        if (strcmp(atual->username, username) == 0)
-        {
-            *usuario = *atual;
-            return 1;
-        }
         atual = atual->prox;
     }
-    return 0;
+
+    if (atual == NULL)
+        return 0;
+
+    *usuario = *atual;
+    return 1;
 }
 
 void liberarHash(Hash *ha)
@@ -377,7 +381,13 @@ void liberarHash(Hash *ha)
         {
             if (ha->usuarios[i] != NULL)
             {
-                free(ha->usuarios[i]);
+                Usuario *atual;
+                while (ha->usuarios[i] != NULL)
+                {
+                    atual = ha->usuarios[i];
+                    ha->usuarios[i] = ha->usuarios[i]->prox;
+                    free(atual);
+                }
             }
         }
         free(ha->usuarios);
@@ -388,34 +398,107 @@ void liberarHash(Hash *ha)
 int cadastrarUsuario(Hash *ha)
 {
     Usuario novoUsuario;
-    printf("Digite o email: ");
+
+    printf("=== Cadastro de Usuário ===\n");
+    printf("Email: ");
     scanf("%s", novoUsuario.email);
-    
-    printf("Digite o username: ");
+    printf("Username: ");
     scanf("%s", novoUsuario.username);
-
-    printf("Digite a senha: ");
+    printf("Senha: ");
     scanf("%s", novoUsuario.senha);
+    printf("Cargo (1 - Vendedor, 2 - Veterinario, 3 - Tosador, 4 - Gerente): ");
+    int cargo;
+    scanf("%d", &cargo);
 
-    printf("O usuário eh (1 para sim, 0 para não):\n");
-    printf("Vendedor: ");
-    scanf("%d", &novoUsuario.vendedor);
-    printf("Veterinario: ");
-    scanf("%d", &novoUsuario.veterinario);
-    printf("Tosador: ");
-    scanf("%d", &novoUsuario.tosador);
-    printf("Gerente: ");
-    scanf("%d", &novoUsuario.gerente);
-    novoUsuario.prox = NULL;
+    novoUsuario.vendedor = novoUsuario.veterinario = novoUsuario.tosador = novoUsuario.gerente = 0;
+
+    switch (cargo)
+    {
+    case 1:
+        novoUsuario.vendedor = 1;
+        break;
+    case 2:
+        novoUsuario.veterinario = 1;
+        break;
+    case 3:
+        novoUsuario.tosador = 1;
+        break;
+    case 4:
+        novoUsuario.gerente = 1;
+        break;
+    default:
+        printf("Cargo inválido!\n");
+        return 0;
+    }
 
     if (inserirUsuario(ha, novoUsuario))
     {
-        printf("%s cadastrado com sucesso!\n", novoUsuario.username);
+        printf("Usuário cadastrado com sucesso!\n");
         return 1;
     }
     else
     {
-        printf("Erro ao cadastrar novo usuário!\n");
+        printf("Erro ao cadastrar usuário!\n");
+        return 0;
+    }
+}
+
+int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
+{
+    char username[50];
+    printf("Digite o username do usuário que deseja remover: ");
+    scanf("%s", username);
+
+    // Checa se o gerente está tentando excluir ele mesmo
+    if (strcmp(gerenteLogado->username, username) == 0)
+    {
+        printf("Você não pode excluir a si mesmo!\n");
+        return 0;
+    }
+
+    Usuario *anterior = NULL;
+    int chave = chaveTabelaPorUsername(username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos];
+
+    // Procura o usuário na lista encadeada
+    while (atual != NULL && strcmp(atual->username, username) != 0)
+    {
+        anterior = atual;
+        atual = atual->prox;
+    }
+
+    if (atual == NULL)
+    {
+        printf("Usuário não encontrado!\n");
+        return 0;
+    }
+
+    // Confirmação de exclusão
+    char confirmacao;
+    printf("Tem certeza que deseja remover o usuário %s? (s/n): ", username);
+    scanf(" %c", &confirmacao);
+
+    if (confirmacao == 's' || confirmacao == 'S')
+    {
+        // Remove o usuário da lista encadeada
+        if (anterior == NULL)
+        {
+            ha->usuarios[pos] = atual->prox;
+        }
+        else
+        {
+            anterior->prox = atual->prox;
+        }
+        free(atual);
+        ha->quantidade--;
+        printf("Usuário %s removido com sucesso!\n", username);
+        return 1;
+    }
+    else
+    {
+        printf("Operação de remoção cancelada.\n");
         return 0;
     }
 }
