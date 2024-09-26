@@ -259,6 +259,8 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
                 cadastrarUsuario(usuarios);
             } else if (opcao == 2) {
                 deletarUsuario(usuarios, gerenteLogado);
+                opcao=0;
+                break;
             } else if(opcao == 3){
                 visualizarTodosUsuarios(usuarios);
             }else if (opcao == 5) {
