@@ -40,6 +40,7 @@ void liberarHash(Hash *ha);
 // Funções CRUD Usuário:
 int cadastrarUsuario(Hash *ha);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
+void visualizarTodosUsuarios(Hash *usuarios);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha) {
@@ -251,16 +252,20 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             printf("-> Gerenciar Funcionários\n");
             printf("1. Cadastrar Usuário\n");
             printf("2. Deletar Usuário\n");
+            printf("3. Visualizar Usuários\n");
             printf("5. voltar\n");
             scanf("%d", &opcao);
             if (opcao == 1) {
                 cadastrarUsuario(usuarios);
             } else if (opcao == 2) {
-                deletarUsuario(usuarios, gerenteLogado); // Chama a função de exclusão
-            } else if (opcao == 5) {
+                deletarUsuario(usuarios, gerenteLogado);
+            } else if(opcao == 3){
+                visualizarTodosUsuarios(usuarios);
+            }else if (opcao == 5) {
                 opcao = 0;
                 break;
             }
+            opcao = 0;
             break;
         case 2:
             printf("Visualizando relatórios...\n");
@@ -440,6 +445,33 @@ int cadastrarUsuario(Hash *ha)
     {
         printf("Erro ao cadastrar usuário!\n");
         return 0;
+    }
+}
+
+void visualizarTodosUsuarios(Hash *usuarios)
+{
+    int i;
+    printf("Lista de Usuários Cadastrados:\n\n");
+    for (i = 0; i < usuarios->TAM_TAB; i++)
+    {
+        Usuario *atual = usuarios->usuarios[i];
+        while (atual != NULL)
+        {
+            printf("%s - ", atual->username);
+
+            if (atual->vendedor)
+                printf("Vendedor\n");
+            else if (atual->veterinario)
+                printf("Veterinário\n");
+            else if (atual->tosador)
+                printf("Tosador\n");
+            else if (atual->gerente)
+                printf("Gerente\n");
+            else
+                printf("Função desconhecida\n");
+
+            atual = atual->prox;
+        }
     }
 }
 
