@@ -39,6 +39,7 @@ void liberarHash(Hash *ha);
 
 // Funções CRUD Usuário:
 int cadastrarUsuario(Hash *ha);
+int verificaSeUsuarioExiste(Hash *ha, int posicao, char * username);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
 void visualizarTodosUsuarios(Hash *usuarios);
 
@@ -346,6 +347,10 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
 
+    if(verificaSeUsuarioExiste(ha, pos, usuario.username)){
+        return 0;
+    }
+
     Usuario *novo = (Usuario *)malloc(sizeof(Usuario));
     if (novo == NULL)
         return 0;
@@ -355,6 +360,26 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     ha->usuarios[pos] = novo;
     ha->quantidade++;
     return 1;
+}
+
+int verificaSeUsuarioExiste(Hash *ha, int posicao, char * username){
+
+     if (ha == NULL)
+        return 0; // Tabela hash inválida 
+
+    Usuario *atual = ha->usuarios[posicao];  // Aponta para o primeiro usuário na posição
+    while (atual != NULL)
+    {
+        if (strcmp(atual->username, username) == 0)
+        {
+            printf("Já existe um usuario com o username: %s\n", username);
+            printf("Tente novamente com outro username.\n");
+            return 1; // Usuário encontrado
+        }
+        atual = atual->prox;  // Avança para o próximo usuário na lista encadeada
+    }
+    
+    return 0; // Usuário não encontrado
 }
 
 int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario)
