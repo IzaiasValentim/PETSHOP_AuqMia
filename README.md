@@ -13,8 +13,8 @@ de usuários, garantindo um desempenho ágil e escalável no tratamento das
 informações.*
 
 2. Execução, na pasta raiz do projeto:
-   - Compilação do arquivo .c: > gcc main.c -o main.exe
-   - Execução: > .\'main.exe'
+   - > Compilação do arquivo .c: gcc main.c -o main.exe
+   - > Execução: .\'main.exe'
 4. Considerações:
    - *No momento apenas trabalhamos com a compatibilidade de execução em ambiente Windows, visto algumas funções como Sleep e uso de caracteres especiais.*
 
