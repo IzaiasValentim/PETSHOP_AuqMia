@@ -27,7 +27,7 @@ void menuVendedor();
 void menuVeterinario();
 void menuTosador();
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
-int login(Hash * usuarios, Usuario *usuarioLogado);
+int login(Hash *usuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
 Hash *criaHash(int TABLE_SIZE);
@@ -39,23 +39,29 @@ void liberarHash(Hash *ha);
 
 // Funções CRUD Usuário:
 int cadastrarUsuario(Hash *ha);
-int verificaSeUsuarioExiste(Hash *ha, int posicao, char * username);
+int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
 void visualizarTodosUsuarios(Hash *usuarios);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
-void exibeUsuarios(Hash *ha) {
-    for (int i = 0; i < ha->TAM_TAB; i++) {
+void exibeUsuarios(Hash *ha)
+{
+    for (int i = 0; i < ha->TAM_TAB; i++)
+    {
         printf("Posição %d:\n", i);
-        Usuario *atual = ha->usuarios[i];  // Pega o primeiro usuário na posição i
-        
-        if (atual == NULL) {
+        Usuario *atual = ha->usuarios[i]; // Pega o primeiro usuário na posição i
+
+        if (atual == NULL)
+        {
             printf("  [Vazio]\n");
-        } else {
+        }
+        else
+        {
             // Percorre a lista encadeada de usuários na posição i
-            while (atual != NULL) {
+            while (atual != NULL)
+            {
                 printf("  Usuário: %s, Email: %s\n", atual->username, atual->email);
-                atual = atual->prox;  // Avança para o próximo usuário na lista encadeada
+                atual = atual->prox; // Avança para o próximo usuário na lista encadeada
             }
         }
     }
@@ -74,7 +80,7 @@ int main()
         {"Tulio@petshop.com", "Tulio", "12345", 0, 0, 1, 0, NULL},
         {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL},
         {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL}};
-        
+
     int totalUsuarios = 11;
 
     Hash *Usuarios = criaHash(totalUsuarios);
@@ -256,15 +262,22 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             printf("3. Visualizar Usuários\n");
             printf("5. voltar\n");
             scanf("%d", &opcao);
-            if (opcao == 1) {
+            if (opcao == 1)
+            {
                 cadastrarUsuario(usuarios);
-            } else if (opcao == 2) {
+            }
+            else if (opcao == 2)
+            {
                 deletarUsuario(usuarios, gerenteLogado);
-                opcao=0;
+                opcao = 0;
                 break;
-            } else if(opcao == 3){
+            }
+            else if (opcao == 3)
+            {
                 visualizarTodosUsuarios(usuarios);
-            }else if (opcao == 5) {
+            }
+            else if (opcao == 5)
+            {
                 opcao = 0;
                 break;
             }
@@ -284,7 +297,7 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
 }
 
 // Função de login
-int login(Hash * usuarios, Usuario *usuarioLogado)
+int login(Hash *usuarios, Usuario *usuarioLogado)
 {
     char username[50], senha[20];
     printf("Digite seu username: ");
@@ -294,10 +307,13 @@ int login(Hash * usuarios, Usuario *usuarioLogado)
 
     Usuario user;
     int buscaUsuario = buscaUsuarioPorUsername(usuarios, username, &user);
-    
-    if(buscaUsuario == 0){ 
+
+    if (buscaUsuario == 0)
+    {
         return 0; // Falha no login, usuário não encontrado.
-    }else{
+    }
+    else
+    {
         if (strcmp(user.username, username) == 0 && strcmp(user.senha, senha) == 0)
         {
             *usuarioLogado = user;
@@ -350,7 +366,8 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
 
-    if(verificaSeUsuarioExiste(ha, pos, usuario.username)){
+    if (verificaSeUsuarioExiste(ha, pos, usuario.username))
+    {
         return 0;
     }
 
@@ -365,12 +382,13 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     return 1;
 }
 
-int verificaSeUsuarioExiste(Hash *ha, int posicao, char * username){
+int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username)
+{
 
-     if (ha == NULL)
-        return 0; // Tabela hash inválida 
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
 
-    Usuario *atual = ha->usuarios[posicao];  // Aponta para o primeiro usuário na posição
+    Usuario *atual = ha->usuarios[posicao]; // Aponta para o primeiro usuário na posição
     while (atual != NULL)
     {
         if (strcmp(atual->username, username) == 0)
@@ -379,9 +397,9 @@ int verificaSeUsuarioExiste(Hash *ha, int posicao, char * username){
             printf("Tente novamente com outro username.\n");
             return 1; // Usuário encontrado
         }
-        atual = atual->prox;  // Avança para o próximo usuário na lista encadeada
+        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
     }
-    
+
     return 0; // Usuário não encontrado
 }
 
