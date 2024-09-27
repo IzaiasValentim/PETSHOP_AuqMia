@@ -46,7 +46,8 @@ void visualizarTodosUsuarios(Hash *usuarios);
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha)
 {
-    for (int i = 0; i < ha->TAM_TAB; i++)
+    int i;
+    for (i = 0; i < ha->TAM_TAB; i++)
     {
         printf("Posição %d:\n", i);
         Usuario *atual = ha->usuarios[i]; // Pega o primeiro usuário na posição i
