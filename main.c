@@ -27,7 +27,7 @@ void menuVendedor();
 void menuVeterinario();
 void menuTosador();
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
-int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado);
+int login(Hash * usuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
 Hash *criaHash(int TABLE_SIZE);
@@ -96,7 +96,7 @@ int main()
     {
         boasVindas();
         // Processo de login
-        if (login(usuarios, totalUsuarios, &usuarioLogado))
+        if (login(Usuarios, &usuarioLogado))
         {
             printf("\nLogin bem-sucedido!\n");
 
@@ -284,24 +284,27 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
 }
 
 // Função de login
-int login(Usuario usuarios[], int totalUsuarios, Usuario *usuarioLogado)
+int login(Hash * usuarios, Usuario *usuarioLogado)
 {
-    char email[50], senha[20];
-
-    printf("Email: ");
-    scanf("%s", email);
-    printf("Senha: ");
+    char username[50], senha[20];
+    printf("Digite seu username: ");
+    scanf("%s", username);
+    printf("Digite sua senha: ");
     scanf("%s", senha);
 
-    for (int i = 0; i < totalUsuarios; i++)
-    {
-        if (strcmp(usuarios[i].email, email) == 0 && strcmp(usuarios[i].senha, senha) == 0)
+    Usuario user;
+    int buscaUsuario = buscaUsuarioPorUsername(usuarios, username, &user);
+    
+    if(buscaUsuario == 0){ 
+        return 0; // Falha no login, usuário não encontrado.
+    }else{
+        if (strcmp(user.username, username) == 0 && strcmp(user.senha, senha) == 0)
         {
-            *usuarioLogado = usuarios[i]; // Preenche o usuário logado
-            return 1;                     // Login bem-sucedido
+            *usuarioLogado = user;
+            return 1; // Login bem-sucedido.
         }
+        return 0; // Senha errada.
     }
-    return 0; // Falha no login
 }
 
 // Implementação de hash para usuários
