@@ -19,8 +19,8 @@ informações.*
    - *No momento apenas trabalhamos com a compatibilidade de execução em ambiente Windows, visto algumas funções como Sleep e uso de caracteres especiais.*
 
 5. Equipe e Papéis:
-    - LUIS IZAÍAS VALENTIM DE AQUINO (Integrador Git/GitHub e Codificador)
-    - PABLO GERALDO LINHARES DO NASCIMENTO LEITE (Testador e Codificador)
-    - STHEFFANY DA CÂMARA GUILHERMINO (Redatora e Codificadora)
+    - LUIS IZAÍAS VALENTIM DE AQUINO (Integrador Git/GitHub)
+    - PABLO GERALDO LINHARES DO NASCIMENTO LEITE (Testador)
+    - STHEFFANY DA CÂMARA GUILHERMINO (Redatora)
     - TÚLIO GOMES DE ARAÚJO FEITOSA (Codificador)
    
