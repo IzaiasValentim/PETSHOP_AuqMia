@@ -14,13 +14,13 @@ informações.*
 
 2. Execução, na pasta raiz do projeto:
    - > Compilação do arquivo .c: gcc main.c -o main.exe
-   - > Execução: .\'main.exe'
+   - > Execução: .\ 'main.exe'
 4. Considerações:
    - *No momento apenas trabalhamos com a compatibilidade de execução em ambiente Windows, visto algumas funções como Sleep e uso de caracteres especiais.*
 
-5. Equipe e Créditos:
+5. Equipe e Papéis:
     - LUIS IZAÍAS VALENTIM DE AQUINO (Integrador Git/GitHub e Codificador)
-    - PABLO GERALDO LINHARES DO NASCIMENTO LEITE (Codificador)
+    - PABLO GERALDO LINHARES DO NASCIMENTO LEITE (Testador e Codificador)
     - STHEFFANY DA CÂMARA GUILHERMINO (Redatora e Codificadora)
-    - TÚLIO GOMES DE ARAÚJO FEITOSA ( Testador e Codificador)
+    - TÚLIO GOMES DE ARAÚJO FEITOSA (Codificador)
    
