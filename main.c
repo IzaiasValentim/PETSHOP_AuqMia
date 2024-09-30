@@ -39,6 +39,7 @@ void liberarHash(Hash *ha);
 
 // Funções CRUD Usuário:
 int cadastrarUsuario(Hash *ha);
+int validarEmail(Hash *ha, char *email);
 int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
 void visualizarTodosUsuarios(Hash *usuarios);
@@ -495,6 +496,41 @@ int cadastrarUsuario(Hash *ha)
         printf("Erro ao cadastrar usuário!\n");
         return 0;
     }
+}
+
+int validarEmail(Hash *ha, char *email)
+{
+
+    // Verifica se o email contém o caractere '@'
+    char *arroba = strchr(email, '@');
+    if (arroba == NULL)
+    {
+        printf("E email deve ter o caractere @.\n");
+        return 1;
+    }
+
+    // Verifica se o comprimento do email é menor que 80 caracteres
+    if (strlen(email) >= 80)
+    {
+        printf("O email deve ser menor que 80 caracteres.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < ha->TAM_TAB; i++)
+    {
+        Usuario *atual = ha->usuarios[i]; // Aponta para o primeiro usuário na posição i
+        while (atual != NULL)
+        {
+            if (strcmp(atual->email, email) == 0)
+            {
+                printf("Já existe um cadastro com este e-mail.\n");
+                return 1; // Email já cadastrado
+            }
+            atual = atual->prox; // Avança para o próximo usuário na lista encadeada
+        }
+    }
+
+    return 0; // Email não encontrado
 }
 
 void visualizarTodosUsuarios(Hash *usuarios)
