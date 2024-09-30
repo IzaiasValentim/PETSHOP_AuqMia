@@ -43,6 +43,7 @@ int validarEmail(Hash *ha, char *email);
 int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
 void visualizarTodosUsuarios(Hash *usuarios);
+int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha)
@@ -632,4 +633,60 @@ int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
         printf("Operação de remoção cancelada.\n");
         return 0;
     }
+}
+
+int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
+{
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    Usuario usuarioAtualizado = *usuarioAntigo;
+
+    printf("=== Atualização de Usuário ===\n");
+    printf("Email, 0 se não quiser atualizar: ");
+    scanf("%s", usuarioAtualizado.email);
+
+    if (strcmp(usuarioAtualizado.email, "0") == 0)
+    {
+        strcpy(usuarioAtualizado.email, usuarioAntigo->email);
+    }
+    else
+    {
+        if (validarEmail(ha, usuarioAtualizado.email))
+        {
+            printf("Realize o atulização com um e-mail válido.\n");
+            return 0;
+        }
+    }
+
+    printf("Username, 0 se não quiser atualizar: ");
+    scanf("%s", usuarioAtualizado.username);
+    Usuario mock;
+    if (strcmp(usuarioAtualizado.username, "0") == 0)
+    {
+        strcpy(usuarioAtualizado.username, usuarioAntigo->username);
+    }
+    else
+    {
+        if (buscaUsuarioPorUsername(ha, usuarioAtualizado.username, &mock) && strcmp(usuarioAtualizado.username, "0") != 0)
+        {
+            printf("Username já existente na base de dados, realize o cadastro novamente!\n");
+            return 0;
+        }
+    }
+
+    printf("Senha: ");
+    scanf("%s", usuarioAtualizado.senha);
+    if (deletarUsuarioSimplificado(ha, *usuarioAntigo))
+    {
+        if (inserirUsuario(ha, usuarioAtualizado))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
 }
