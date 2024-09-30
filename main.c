@@ -23,9 +23,9 @@ typedef struct hash
 } Hash;
 
 void boasVindas();
-void menuVendedor();
-void menuVeterinario();
-void menuTosador();
+void menuVendedor(Hash *usuarios, Usuario *logado);
+void menuVeterinario(Hash *usuarios, Usuario *logado);
+void menuTosador(Hash *usuarios, Usuario *logado);
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
 int login(Hash *usuarios, Usuario *usuarioLogado);
 
@@ -42,8 +42,10 @@ int cadastrarUsuario(Hash *ha);
 int validarEmail(Hash *ha, char *email);
 int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username);
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
+int deletarUsuarioSimplificado(Hash *ha, Usuario usuario);
 void visualizarTodosUsuarios(Hash *usuarios);
 int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
+int atualizarCargoDeFuncionario(Hash *ha, char *username);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha)
@@ -73,6 +75,7 @@ void exibeUsuarios(Hash *ha)
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
+    
     // Lista de usuários cadastrados (para exemplo)
     Usuario usuarios[] = {
         {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL},
@@ -84,7 +87,7 @@ int main()
         {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL},
         {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL}};
 
-    int totalUsuarios = 11;
+    int totalUsuarios = 17;
 
     Hash *Usuarios = criaHash(totalUsuarios);
     inserirUsuario(Usuarios, usuarios[0]);
@@ -112,15 +115,15 @@ int main()
             // Verifica o tipo de usuário e exibe o menu correspondente
             if (usuarioLogado.vendedor)
             {
-                menuVendedor();
+                menuVendedor(Usuarios, &usuarioLogado);
             }
             else if (usuarioLogado.veterinario)
             {
-                menuVeterinario();
+                menuVeterinario(Usuarios, &usuarioLogado);
             }
             else if (usuarioLogado.tosador)
             {
-                menuTosador();
+                menuTosador(Usuarios, &usuarioLogado);
             }
             else if (usuarioLogado.gerente)
             {
@@ -159,7 +162,7 @@ void boasVindas()
     printf("====      Realize o login :      ====\n\n");
 }
 
-void menuVendedor()
+void menuVendedor(Hash *usuarios, Usuario *logado)
 {
     int opcao;
     do
@@ -167,7 +170,8 @@ void menuVendedor()
         printf("=== Menu Vendedor ===\n");
         printf("1. Realizar Venda\n");
         printf("2. Agendar Serviço\n");
-        printf("3. Sair\n");
+        printf("5. Atualizar minhas informações \n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -181,23 +185,35 @@ void menuVendedor()
             printf("Agendando serviço...\n");
             // Lógica para agendar serviço
             break;
-        case 3:
+        case 5:
+            if (atualizarUsuario(usuarios, logado))
+            {
+                printf("Atualização realizada com sucesso!\n");
+            }
+            else
+            {
+                printf("Erro ao realizar atualização!\n");
+            }
+            opcao = 0;
+            break;
+        case 6:
             printf("Saindo do menu vendedor...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 3);
+    } while (opcao != 6);
 }
 
-void menuVeterinario()
+void menuVeterinario(Hash *usuarios, Usuario *logado)
 {
     int opcao;
     do
     {
         printf("=== Menu Veterinário ===\n");
         printf("1. Realizar Atendimento\n");
-        printf("2. Sair\n");
+        printf("5. Atualizar minhas informações.\n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -207,23 +223,35 @@ void menuVeterinario()
             printf("Realizando atendimento...\n");
             // Lógica para realizar atendimento
             break;
-        case 2:
+        case 5:
+            if (atualizarUsuario(usuarios, logado))
+            {
+                printf("Atualização realizada com sucesso!\n");
+            }
+            else
+            {
+                printf("Erro ao realizar atualização!\n");
+            }
+            opcao = 0;
+            break;
+        case 6:
             printf("Saindo do menu veterinário...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 2);
+    } while (opcao != 6);
 }
 
-void menuTosador()
+void menuTosador(Hash *usuarios, Usuario *logado)
 {
     int opcao;
     do
     {
         printf("=== Menu Tosador ===\n");
         printf("1. Realizar Tosa\n");
-        printf("2. Sair\n");
+        printf("5. Atualizar minhas informações.\n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -233,13 +261,24 @@ void menuTosador()
             printf("Realizando tosa...\n");
             // Lógica para realizar tosa
             break;
-        case 2:
+        case 5:
+            if (atualizarUsuario(usuarios, logado))
+            {
+                printf("Atualização realizada com sucesso!\n");
+            }
+            else
+            {
+                printf("Erro ao realizar atualização!\n");
+            }
+            opcao = 0;
+            break;
+        case 6:
             printf("Saindo do menu tosador...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 2);
+    } while (opcao != 6);
 }
 
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
@@ -259,11 +298,13 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
         case 1:
             printf("Gerenciando funcionários...\n");
             opcao = 0;
-            printf("-> Gerenciar Funcionários\n");
-            printf("1. Cadastrar Usuário\n");
-            printf("2. Deletar Usuário\n");
-            printf("3. Visualizar Usuários\n");
-            printf("5. voltar\n");
+            printf("-> Gerenciar Funcionários.\n");
+            printf("1. Cadastrar Usuário.\n");
+            printf("2. Deletar Usuário.\n");
+            printf("3. Visualizar Usuários.\n");
+            printf("4. Atualizar minhas informações.\n");
+            printf("5. Atualizar cargo de um funcionário.\n");
+            printf("6. voltar\n");
             scanf("%d", &opcao);
             if (opcao == 1)
             {
@@ -279,7 +320,35 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             {
                 visualizarTodosUsuarios(usuarios);
             }
+            else if (opcao == 4)
+            {
+                if (atualizarUsuario(usuarios, gerenteLogado))
+                {
+                    printf("Atualização realizada com sucesso!\n");
+                }
+                else
+                {
+                    printf("Erro ao realizar atualização!\n");
+                }
+                opcao = 0;
+                break;
+            }
             else if (opcao == 5)
+            {
+                visualizarTodosUsuarios(usuarios);
+                char username[50];
+                printf("Informe o username: ");
+                scanf("%s", username);
+                if (atualizarCargoDeFuncionario(usuarios, username))
+                {
+                    printf("Cargo atualizado com sucesso!\n");
+                }
+                else
+                {
+                    printf("Erro ao atualizar cargo!\n");
+                }
+            }
+            else if (opcao == 6)
             {
                 opcao = 0;
                 break;
@@ -635,6 +704,48 @@ int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
     }
 }
 
+int deletarUsuarioSimplificado(Hash *ha, Usuario usuario)
+{
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    // Calcula a chave e a posição na tabela hash com base no username do usuário
+    int chave = chaveTabelaPorUsername(usuario.username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos];
+    Usuario *anterior = NULL;
+
+    // Percorre a lista encadeada na posição calculada
+    while (atual != NULL)
+    {
+        // Verifica se o usuário atual é o que deve ser deletado
+        if (strcmp(atual->username, usuario.username) == 0 && strcmp(atual->email, usuario.email) == 0)
+        {
+            if (anterior == NULL)
+            {
+                // O usuário a ser deletado é o primeiro na lista
+                ha->usuarios[pos] = atual->prox;
+            }
+            else
+            {
+                // O usuário a ser deletado está no meio ou no final da lista
+                anterior->prox = atual->prox;
+            }
+
+            free(atual);      // Libera a memória do usuário deletado
+            ha->quantidade--; // Diminui a quantidade de usuários na hash
+            return 1;         // Usuário deletado com sucesso
+        }
+
+        // Avança para o próximo usuário na lista encadeada
+        anterior = atual;
+        atual = atual->prox;
+    }
+
+    return 0; // Usuário não encontrado
+}
+
 int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
 {
     if (ha == NULL)
@@ -689,4 +800,54 @@ int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
         }
     }
     return 0;
+}
+
+int atualizarCargoDeFuncionario(Hash *ha, char *username)
+{
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    // Calcula a chave e a posição na tabela hash com base no username
+    int chave = chaveTabelaPorUsername(username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos]; // Aponta para o primeiro usuário na posição
+
+    // Percorre a lista encadeada de usuários na posição calculada
+    while (atual != NULL)
+    {
+        // Verifica se o usuário foi encontrado pelo username
+        if (strcmp(atual->username, username) == 0)
+        {
+            printf("Informe o novo cargo de %s\n", atual->username);
+            printf("Cargo (1 - Vendedor, 2 - Veterinario, 3 - Tosador, 4 - Gerente): ");
+            int cargo;
+            scanf("%d", &cargo);
+
+            atual->vendedor = atual->veterinario = atual->tosador = atual->gerente = 0;
+
+            switch (cargo)
+            {
+            case 1:
+                atual->vendedor = 1;
+                break;
+            case 2:
+                atual->veterinario = 1;
+                break;
+            case 3:
+                atual->tosador = 1;
+                break;
+            case 4:
+                atual->gerente = 1;
+                break;
+            default:
+                printf("Cargo inválido!\n");
+                return 0;
+            }
+            return 1; // Cargo atualizado com sucesso
+        }
+        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
+    }
+
+    return 0; // Usuário não encontrado
 }
