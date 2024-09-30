@@ -457,8 +457,22 @@ int cadastrarUsuario(Hash *ha)
     printf("=== Cadastro de Usuário ===\n");
     printf("Email: ");
     scanf("%s", novoUsuario.email);
+
+    if (validarEmail(ha, novoUsuario.email))
+    {
+        printf("Realize o cadastro novamente!\n");
+        return 0;
+    }
+
     printf("Username: ");
     scanf("%s", novoUsuario.username);
+    Usuario mock;
+    if (buscaUsuarioPorUsername(ha, novoUsuario.username, &mock))
+    {
+        printf("Username já existente na base de dados, realize o cadastro novamente!\n");
+        return 0;
+    }
+
     printf("Senha: ");
     scanf("%s", novoUsuario.senha);
     printf("Cargo (1 - Vendedor, 2 - Veterinario, 3 - Tosador, 4 - Gerente): ");
