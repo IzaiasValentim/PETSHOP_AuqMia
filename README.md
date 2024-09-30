@@ -18,7 +18,7 @@ um Pet Shop chamado AuqMia, implementado em linguagem C. O objetivo é permitir 
    - > Compilação do arquivo .c: gcc main.c -o main.exe
    - > Execução: .\\'main.exe'
 4. Considerações:
-   - *Na aba "Issues" é possível acompanhar detalhadamente a descrição das tarefas realizadas e atribuídas a cada integrante. Em resumo, até o momento surgiram tarefas de atualização de documentação, correção de compatibilidade de código aos diferentes compiladores dos integrantes, atualização de código e implementação de novas funcionalidades.*
+   - *Foi adotada a funcionalidade "Issues" do GitHub para cadastro e acompanhamento das demandas. Logo, na aba "Issues" é possível acompanhar detalhadamente a descrição dos problemas que surgiram, sua resolução e atribuição aos integrantes. Em resumo, até o momento surgiram tarefas de atualização de documentação, correção de compatibilidade de código aos diferentes compiladores dos integrantes, atualização de código e implementação de novas funcionalidades.*
    - *No momento apenas trabalhamos com a compatibilidade de execução em ambiente Windows, visto algumas funções como Sleep e uso de caracteres especiais.*
 6. Equipe e Papéis:
     - LUIS IZAÍAS VALENTIM DE AQUINO (Integrador Git/GitHub)
