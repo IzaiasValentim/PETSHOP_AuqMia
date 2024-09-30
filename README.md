@@ -14,6 +14,7 @@ um Pet Shop chamado AuqMia, implementado em linguagem C. O objetivo é permitir 
       -  (update) int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
       -  (update) int atualizarCargoDeFuncionario(Hash *ha, char *username);
 2. Execução, na pasta raiz do projeto:
+   - > Compilador utilizado: MinGW.org GCC-6.3.0-1
    - > Compilação do arquivo .c: gcc main.c -o main.exe
    - > Execução: .\\'main.exe'
 4. Considerações:
