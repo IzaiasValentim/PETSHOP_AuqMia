@@ -18,6 +18,8 @@ um Pet Shop chamado AuqMia, implementado em linguagem C. O objetivo é permitir 
    - > Compilação do arquivo .c: gcc main.c -o main.exe
    - > Execução: .\\'main.exe'
 4. Considerações:
+   - *Na pasta "Utils", ./Utils, foram adicionadas os modelos base de estruturas de dados as quais estão sendo ou foram implementadas. No arquivo há um comentário com a fonte dos códigos.*
+   - *Ainda na pasta citada anteriormente, foi adicionado um diagrama com a modelagem do nosso sistema como meio auxiliar de desenvolvimento e para documentação.*
    - *Foi adotada a funcionalidade "Issues" do GitHub para cadastro e acompanhamento das demandas. Logo, na aba "Issues" é possível acompanhar detalhadamente a descrição dos problemas que surgiram, sua resolução e atribuição aos integrantes. Em resumo, até o momento surgiram tarefas de atualização de documentação, correção de compatibilidade de código aos diferentes compiladores dos integrantes, atualização de código e implementação de novas funcionalidades.*
    - *No momento apenas trabalhamos com a compatibilidade de execução em ambiente Windows, visto algumas funções como Sleep e uso de caracteres especiais.*
 6. Equipe e Papéis:
