@@ -168,24 +168,88 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
     do
     {
         printf("=== Menu Vendedor ===\n");
-        printf("1. Realizar Venda\n");
-        printf("2. Agendar Serviço\n");
-        printf("5. Atualizar minhas informações \n");
-        printf("6. Sair\n");
+        printf("1. Atendimento veterinário\n");
+        printf("2. Banho/Tosa\n");
+        printf("3. Atualizar minhas informações \n");
+        printf("4. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
-            printf("Realizando venda...\n");
-            // Lógica para realizar venda
+            opcao = 0;
+            printf("-> Atendimento veterinário: \n");
+            printf("1. Horarios disponiveis.\n");
+            printf("2. Marcar atendimento.\n");
+            printf("3. Desmarcar atendimento.\n");
+            printf("4. Alterar atendimento.\n");
+            printf("5. voltar\n");
+            scanf("%d", &opcao);
+            if (opcao == 1)
+            {
+                printf("Horarios disponiveis\n");
+                opcao=0;
+                break;
+            }
+            else if (opcao == 2)
+            {
+                printf("Marcar atendiemnto \n");
+                opcao=0;
+                break;
+            }else if (opcao == 3)
+            {
+                printf("Desmarcar atendimento \n");
+                opcao=0;
+                break;
+            }else if (opcao == 4)
+            {
+                printf("Alterar atendiemnto \n");
+                opcao=0;
+                break;
+            }else if (opcao == 5)
+            {
+                opcao=0;
+                break;
+            }
             break;
         case 2:
-            printf("Agendando serviço...\n");
-            // Lógica para agendar serviço
+            opcao = 0;
+            printf("-> Banho e Tosa: \n");
+            printf("1. Horarios disponiveis.\n");
+            printf("2. Marcar Banho/Tosa.\n");
+            printf("3. Desmarcar Banho/Tosa.\n");
+            printf("4. Alterar Banho/Tosa.\n");
+            printf("5. voltar\n");
+            scanf("%d", &opcao);
+            if (opcao == 1)
+            {
+                printf("Horarios disponiveis\n");
+                opcao=0;
+                break;
+            }
+            else if (opcao == 2)
+            {
+                printf("Marcar Marcar Banho/Tosa: \n");
+                opcao=0;
+                break;
+            }else if (opcao == 3)
+            {
+                printf("Desmarcar Banho/Tosa \n");
+                opcao=0;
+                break;
+            }else if (opcao == 4)
+            {
+                printf("Alterar Banho/Tosa \n");
+                opcao=0;
+                break;
+            }else if (opcao == 5)
+            {
+                opcao=0;
+                break;
+            }
             break;
-        case 5:
+        case 3:
             if (atualizarUsuario(usuarios, logado))
             {
                 printf("Atualização realizada com sucesso!\n");
@@ -196,13 +260,13 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
             }
             opcao = 0;
             break;
-        case 6:
+        case 4:
             printf("Saindo do menu vendedor...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 6);
+    } while (opcao != 4);
 }
 
 void menuVeterinario(Hash *usuarios, Usuario *logado)
@@ -211,19 +275,29 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
     do
     {
         printf("=== Menu Veterinário ===\n");
-        printf("1. Realizar Atendimento\n");
-        printf("5. Atualizar minhas informações.\n");
-        printf("6. Sair\n");
+        printf("1. Cadastrar dia de atendimento\n");
+        printf("2. Realizar checkin\n");
+        printf("3. Visualizar atendimentos\n");
+        printf("4. Atualizar minhas informações.\n");
+        printf("5. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
-            printf("Realizando atendimento...\n");
-            // Lógica para realizar atendimento
+            printf("Cadastrar dia de atendimento...\n");
+            // Lógica para realizar atendimento veterinário.
             break;
-        case 5:
+        case 2:
+            printf("Realizar checkin...\n");
+            // Lógica para realizar atendimento veterinário.
+            break;
+        case 3:
+            printf("Visualizar atendimentos...\n");
+            // Lógica para realizar atendimento veterinário de acordo com filtro.
+            break;
+        case 4:
             if (atualizarUsuario(usuarios, logado))
             {
                 printf("Atualização realizada com sucesso!\n");
@@ -234,13 +308,13 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
             }
             opcao = 0;
             break;
-        case 6:
+        case 5:
             printf("Saindo do menu veterinário...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 6);
+    } while (opcao != 5);
 }
 
 void menuTosador(Hash *usuarios, Usuario *logado)
@@ -249,19 +323,29 @@ void menuTosador(Hash *usuarios, Usuario *logado)
     do
     {
         printf("=== Menu Tosador ===\n");
-        printf("1. Realizar Tosa\n");
-        printf("5. Atualizar minhas informações.\n");
-        printf("6. Sair\n");
+        printf("1. Cadastrar dia de atendimento\n");
+        printf("2. Realizar checkin\n");
+        printf("3. Visualizar atendimentos\n");
+        printf("4. Atualizar minhas informações.\n");
+        printf("5. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
-            printf("Realizando tosa...\n");
-            // Lógica para realizar tosa
+            printf("Cadastrar dia de atendimento...\n");
+            // Lógica para realizar atendimento banho e tosa.
             break;
-        case 5:
+        case 2:
+            printf("Realizar checkin...\n");
+            // Lógica para realizar checkin do atendimento banho/tosa.
+            break;
+        case 3:
+            printf("Visualizar atendimentos...\n");
+            // Visualizar banho/tosa de acordo com filtro de dia.
+            break;
+        case 4:
             if (atualizarUsuario(usuarios, logado))
             {
                 printf("Atualização realizada com sucesso!\n");
@@ -272,13 +356,13 @@ void menuTosador(Hash *usuarios, Usuario *logado)
             }
             opcao = 0;
             break;
-        case 6:
-            printf("Saindo do menu tosador...\n");
+        case 5:
+            printf("Saindo do menu banho/tosa...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 6);
+    } while (opcao != 5);
 }
 
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
@@ -309,6 +393,8 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             if (opcao == 1)
             {
                 cadastrarUsuario(usuarios);
+                opcao = 0;
+                break;
             }
             else if (opcao == 2)
             {
@@ -356,9 +442,26 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             opcao = 0;
             break;
         case 2:
-            printf("Visualizando relatórios...\n");
-            // Lógica para ver relatórios
-            break;
+            opcao = 0;
+            printf("-> Visualização de relatórios:\n");
+            printf("1. Relatório mensal.\n");
+            printf("2. Balanço total\n");
+            printf("3. voltar\n");
+            scanf("%d", &opcao);
+            if (opcao == 1)
+            {
+                printf("Informe o mês de interesse:\n");
+                break;
+            }
+            else if (opcao == 2)
+            {
+                printf("Balanço total entre xx/xx/xxxx e xx/xx/xxxx: \n");
+                break;
+            }else if (opcao == 3)
+            {
+                opcao=0;
+                break;
+            }
         case 3:
             printf("Saindo do menu gerente...\n");
             break;
