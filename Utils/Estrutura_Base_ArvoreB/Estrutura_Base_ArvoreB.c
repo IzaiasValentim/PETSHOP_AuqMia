@@ -5,12 +5,12 @@
 /*
     ** Info:
             A versão inicial da Árvore Binária foi implementada seguindo os códigos
-            disponibilizadas no capítulo 12(doze) do livro: 
+            disponibilizados no capítulo 12(doze) do livro: 
 
             BACKES, André R. Algoritmos e Estruturas de Dados em Linguagem C.
             Rio de Janeiro: LTC, 2023. E-book. ISBN 9788521638315.
             Disponível em: https://app.minhabiblioteca.com.br/#/books/9788521638315/.
-            Acesso em: 22 set. 2024.
+            Acesso em: 05 out. 2024.
 
             Foram realizadas pequenas alterações para que a estrutura de dados lidasse com o nosso tipo de dado.
 */
