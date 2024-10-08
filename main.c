@@ -22,10 +22,48 @@ typedef struct hash
     Usuario **usuarios;
 } Hash;
 
+// Implementação Árvore Binária:
+typedef struct consulta
+{
+    char usernameProfisional[50];
+    char nomeResponsavel[50];
+    char contatoResponsavel[100];
+    int porteAnimal;
+    char status[30];
+    float valor;
+    int consultaVeterinaria;
+    int banho;
+    int tosa;
+    char detalhes[300];
+} Consulta;
+
+typedef struct atendimento
+{
+    char usernameProfisional[50];
+    int dia;
+    int mes;
+    int ano;
+    int qntHorarios;
+    // No momento apenas demontrativo. Futuramente será uma heap-binária.
+    // A prioridade será de acordo com o horário 1(maior) - 5(menor);
+    Consulta consultas[5];
+} Atendimento;
+
+// Cada usuário terá sua árvore binária com seus atendimentos. Assim não acontece conflito.
+typedef struct NO *Atendimentos;
+
+struct NO
+{
+    // A inserção será ponderada de acordo com a data;
+    Atendimento atendimento;
+    struct NO *esq;
+    struct NO *dir;
+};
+
 void boasVindas();
 void menuVendedor(Hash *usuarios, Usuario *logado);
-void menuVeterinario(Hash *usuarios, Usuario *logado);
-void menuTosador(Hash *usuarios, Usuario *logado);
+void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado);
+void menuTosador(Hash *usuarios,Atendimentos *raiz, Usuario *logado);
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
 int login(Hash *usuarios, Usuario *usuarioLogado);
 
@@ -72,45 +110,6 @@ void exibeUsuarios(Hash *ha)
     }
 }
 
-// Implementação Árvore Binária:
-
-typedef struct consulta
-{
-    char usernameProfisional[50];
-    char nomeResponsavel[50];
-    char contatoResponsavel[100];
-    int porteAnimal;
-    char status[30];
-    float valor;
-    int consultaVeterinaria;
-    int banho;
-    int tosa;
-    char detalhes[300];
-} Consulta;
-
-typedef struct atendimento
-{
-    char usernameProfisional[50];
-    int dia;
-    int mes;
-    int ano;
-    int qntHorarios;
-    // No momento apenas demontrativo. Futuramente será uma heap-binária.
-    // A prioridade será de acordo com o horário 1(maior) - 5(menor);
-    Consulta consultas[5];
-} Atendimento;
-
-// Cada usuário terá sua árvore binária com seus atendimentos. Assim não acontece conflito.
-typedef struct NO *Atendimentos;
-
-struct NO
-{
-    // A inserção será ponderada de acordo com a data;
-    Atendimento atendimento;
-    struct NO *esq;
-    struct NO *dir;
-};
-
 // Funções da nossa árvore binária.
 Atendimentos *cria_ArvBin();
 void libera_ArvBin(Atendimentos *raiz);
@@ -121,13 +120,17 @@ int totalNO_ArvBin(Atendimentos *raiz);
 int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
 void preordem_ArvBin(Atendimentos *raiz);
 
+// Funções do Atendimento:
+
+int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario);
+
 // Funções auxiliares
 int comparaDatas(Atendimento a1, Atendimento a2);
 
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
-    
+
     // Lista de usuários cadastrados (para exemplo)
     Usuario usuarios[] = {
         {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL},
@@ -153,6 +156,9 @@ int main()
 
     Usuario usuarioLogado;
 
+    Atendimentos *atendimentosVeterinario = cria_ArvBin();
+    Atendimentos *atendimentoTosador = cria_ArvBin();
+
     int continuar = 1; // Variável para controlar o loop do sistema
 
     // Loop principal do sistema
@@ -171,11 +177,11 @@ int main()
             }
             else if (usuarioLogado.veterinario)
             {
-                menuVeterinario(Usuarios, &usuarioLogado);
+                menuVeterinario(Usuarios, atendimentosVeterinario, &usuarioLogado);
             }
             else if (usuarioLogado.tosador)
             {
-                menuTosador(Usuarios, &usuarioLogado);
+                menuTosador(Usuarios,atendimentoTosador, &usuarioLogado);
             }
             else if (usuarioLogado.gerente)
             {
@@ -241,27 +247,30 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
             if (opcao == 1)
             {
                 printf("Horarios disponiveis\n");
-                opcao=0;
+                opcao = 0;
                 break;
             }
             else if (opcao == 2)
             {
                 printf("Marcar atendiemnto \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 3)
+            }
+            else if (opcao == 3)
             {
                 printf("Desmarcar atendimento \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 4)
+            }
+            else if (opcao == 4)
             {
                 printf("Alterar atendiemnto \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 5)
+            }
+            else if (opcao == 5)
             {
-                opcao=0;
+                opcao = 0;
                 break;
             }
             break;
@@ -277,27 +286,30 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
             if (opcao == 1)
             {
                 printf("Horarios disponiveis\n");
-                opcao=0;
+                opcao = 0;
                 break;
             }
             else if (opcao == 2)
             {
                 printf("Marcar Marcar Banho/Tosa: \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 3)
+            }
+            else if (opcao == 3)
             {
                 printf("Desmarcar Banho/Tosa \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 4)
+            }
+            else if (opcao == 4)
             {
                 printf("Alterar Banho/Tosa \n");
-                opcao=0;
+                opcao = 0;
                 break;
-            }else if (opcao == 5)
+            }
+            else if (opcao == 5)
             {
-                opcao=0;
+                opcao = 0;
                 break;
             }
             break;
@@ -321,14 +333,14 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
     } while (opcao != 4);
 }
 
-void menuVeterinario(Hash *usuarios, Usuario *logado)
+void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
 {
     int opcao;
     do
     {
         printf("=== Menu Veterinário ===\n");
         printf("1. Cadastrar dia de atendimento\n");
-        printf("2. Realizar checkin\n");
+        printf("2. Realizar checkin\n"); // Agora não
         printf("3. Visualizar atendimentos\n");
         printf("4. Atualizar minhas informações.\n");
         printf("5. Sair\n");
@@ -338,8 +350,8 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
         switch (opcao)
         {
         case 1:
-            printf("Cadastrar dia de atendimento...\n");
-            // Lógica para realizar atendimento veterinário.
+            // printf("Cadastrar dia de atendimento...\n");
+            cadastrarAtendimento(raiz, logado);
             break;
         case 2:
             printf("Realizar checkin...\n");
@@ -347,7 +359,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
             break;
         case 3:
             printf("Visualizar atendimentos...\n");
-            // Lógica para realizar atendimento veterinário de acordo com filtro.
+            preordem_ArvBin(raiz);
             break;
         case 4:
             if (atualizarUsuario(usuarios, logado))
@@ -369,7 +381,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
     } while (opcao != 5);
 }
 
-void menuTosador(Hash *usuarios, Usuario *logado)
+void menuTosador(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
 {
     int opcao;
     do
@@ -387,7 +399,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
         {
         case 1:
             printf("Cadastrar dia de atendimento...\n");
-            // Lógica para realizar atendimento banho e tosa.
+            // Replicar a lógica de cadastro similar à realizada no menu veterinário.
             break;
         case 2:
             printf("Realizar checkin...\n");
@@ -396,6 +408,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
         case 3:
             printf("Visualizar atendimentos...\n");
             // Visualizar banho/tosa de acordo com filtro de dia.
+            // Replicar a visualização do atendimento similar à realizada no meu veterinário.
             break;
         case 4:
             if (atualizarUsuario(usuarios, logado))
@@ -509,9 +522,10 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             {
                 printf("Balanço total entre xx/xx/xxxx e xx/xx/xxxx: \n");
                 break;
-            }else if (opcao == 3)
+            }
+            else if (opcao == 3)
             {
-                opcao=0;
+                opcao = 0;
                 break;
             }
         case 3:
@@ -1062,7 +1076,7 @@ void preordem_ArvBin(Atendimentos *raiz)
         return;
     if (*raiz != NULL)
     {
-        printf("%s\n", (*raiz)->atendimento.usernameProfisional);
+        printf("%s - %d/%d/%d\n", (*raiz)->atendimento.usernameProfisional, (*raiz)->atendimento.dia, (*raiz)->atendimento.mes, (*raiz)->atendimento.ano);
         preordem_ArvBin(&((*raiz)->esq));
         preordem_ArvBin(&((*raiz)->dir));
     }
@@ -1165,4 +1179,37 @@ int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento)
     }
 
     return 0; // Atendimento não encontrado
+}
+
+int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
+{
+    if (raiz == NULL)
+    {
+        printf("Árvore inválida.\n");
+        return 0; // Falha ao cadastrar
+    }
+
+    Atendimento novoAtendimento;
+
+    // Solicita os dados do atendimento ao usuário
+    printf("=== Cadastro de Atendimento ===\n");
+    strcpy(novoAtendimento.usernameProfisional, usuario->username);
+
+    printf("Digite a data do atendimento (dia mes ano): ");
+    scanf("%d %d %d", &novoAtendimento.dia, &novoAtendimento.mes, &novoAtendimento.ano);
+
+    // Você pode adicionar mais campos aqui conforme necessário.
+    // Exemplo: novoAtendimento.descricao, novoAtendimento.hora, etc.
+
+    // Insere o novo atendimento na árvore binária
+    if (insere_ArvBin(raiz, novoAtendimento))
+    {
+        printf("Atendimento cadastrado com sucesso!\n");
+        return 1;
+    }
+    else
+    {
+        printf("Erro ao cadastrar o atendimento.\n");
+        return 0; // Falha ao cadastrar
+    }
 }
