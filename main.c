@@ -2,32 +2,19 @@
 #include <string.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <time.h>
 
-// Estrutura para armazenar os dados do usuário
-typedef struct Usuario
-{
-    char email[50];
-    char username[50];
-    char senha[20];
-    int vendedor;
-    int veterinario;
-    int tosador;
-    int gerente;
-    struct Usuario *prox;
-} Usuario;
-
-typedef struct hash
-{
-    int quantidade, TAM_TAB;
-    Usuario **usuarios;
-} Hash;
+#define MAX_ATENDIMENTOS 8
 
 // Implementação Árvore Binária:
 typedef struct consulta
 {
     char usernameProfisional[50];
-    char nomeResponsavel[50];
-    char contatoResponsavel[100];
+    char usernameAtendente[50];
+    char nomeTutor[50];
+    char contatoResponsavel[20];
+    char enderecoResponsavel[100];
+    char nomeAnimal[50];
     int porteAnimal;
     char status[30];
     float valor;
@@ -35,7 +22,16 @@ typedef struct consulta
     int banho;
     int tosa;
     char detalhes[300];
+    int horario;
+    int concluida;
 } Consulta;
+
+typedef struct fila_Consultas
+{
+    int qtd;
+    Consulta consulta[MAX_ATENDIMENTOS];
+    int prioridade[MAX_ATENDIMENTOS];
+} Consultas;
 
 typedef struct atendimento
 {
@@ -44,9 +40,7 @@ typedef struct atendimento
     int mes;
     int ano;
     int qntHorarios;
-    // No momento apenas demontrativo. Futuramente será uma heap-binária.
-    // A prioridade será de acordo com o horário 1(maior) - 5(menor);
-    Consulta consultas[5];
+    Consultas *consultas;
 } Atendimento;
 
 // Cada usuário terá sua árvore binária com seus atendimentos. Assim não acontece conflito.
@@ -60,10 +54,30 @@ struct NO
     struct NO *dir;
 };
 
+// Estrutura para armazenar os dados do usuário
+typedef struct Usuario
+{
+    char email[50];
+    char username[50];
+    char senha[20];
+    int vendedor;
+    int veterinario;
+    int tosador;
+    int gerente;
+    struct Usuario *prox;
+    Atendimentos *arvoreAtendimentos;
+} Usuario;
+
+typedef struct hash
+{
+    int quantidade, TAM_TAB;
+    Usuario **usuarios;
+} Hash;
+
 void boasVindas();
-void menuVendedor(Hash *usuarios, Usuario *logado);
-void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado);
-void menuTosador(Hash *usuarios,Atendimentos *raiz, Usuario *logado);
+void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int quantidadeConsultores);
+void menuVeterinario(Hash *usuarios, Usuario *logado);
+void menuTosador(Hash *usuarios, Usuario *logado);
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
 int login(Hash *usuarios, Usuario *usuarioLogado);
 
@@ -84,6 +98,8 @@ int deletarUsuarioSimplificado(Hash *ha, Usuario usuario);
 void visualizarTodosUsuarios(Hash *usuarios);
 int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
 int atualizarCargoDeFuncionario(Hash *ha, char *username);
+Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados);
+Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, int veterinario);
 
 // Função apenas para fins de desenvolvimento, remover antes da entrega.
 void exibeUsuarios(Hash *ha)
@@ -119,14 +135,44 @@ int estaVazia_ArvBin(Atendimentos *raiz);
 int totalNO_ArvBin(Atendimentos *raiz);
 int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
 void preordem_ArvBin(Atendimentos *raiz);
-
+void solicitarDiaDeAtendimento(Atendimento *atendimento);
 // Funções do Atendimento:
-
 int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario);
+
+// Funções Heap|Consultas
+Consultas *cria_FilaPrio(); // Cria a fila de prioridade com o array de consultas em estado de consultas vagas.
+void libera_FilaPrio(Consultas *fila_Consultas);
+
+int insere_FilaPrio(Consultas *fila_Consultas, int horario);      // Adiciona um horário de atendimento à fila.
+void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); // Função complementar de inserção.
+
+void consulta_FilaPrio(Consultas *fila_Consultas);   // Retorna a próxima consulta.
+void visualizar_FilaPrio(Consultas *fila_Consultas); // Retorna a lista total.
+
+int remove_FilaPrio(Consultas *fila_Consultas);            // Finaliza a próxima consulta e realiza o checkin.
+void rebaixarElemento(Consultas *fila_Consultas, int pai); // Função complementar de remoção.
+int realizarCheckin(Consultas *fila_Consultas);            // Marca a próxima consulta da lista como Concluída e a Remove a prioridade. Mas a consulta ainda permance na lista.
+
+int tamanho_FilaPrio(Consultas *fila_Consultas);   // Aux.
+int estaCheia_FilaPrio(Consultas *fila_Consultas); // Aux.
+int estaVazia_FilaPrio(Consultas *fila_Consultas); // Aux.
+
+int marcarConsulta(Consultas *fila_Consultas);
+int atualizarConsulta(Consultas *fila_Consultas);
+int desmarcarConsulta(Consultas *fila_Consultas);
 
 // Funções auxiliares
 int comparaDatas(Atendimento a1, Atendimento a2);
+void setarDataNoAtendimento(Atendimento *atendimento)
+{
 
+    time_t t = time(NULL);              // Obtém o tempo atual
+    struct tm *tm_info = localtime(&t); // Converte para a estrutura tm
+
+    atendimento->dia = tm_info->tm_mday;
+    atendimento->mes = tm_info->tm_mon + 1;
+    atendimento->ano = tm_info->tm_year + 1900;
+}
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
@@ -1212,4 +1258,440 @@ int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
         printf("Erro ao cadastrar o atendimento.\n");
         return 0; // Falha ao cadastrar
     }
+}
+
+
+Consultas *cria_FilaPrio()
+{
+    Consultas *fp;
+    fp = (Consultas *)malloc(sizeof(Consultas));
+    if (fp != NULL)
+    {
+        fp->qtd = 0;
+        int i;
+        // Preenche o array de consultas com valores padrões e horários corretos
+        for (i = 0; i < MAX_ATENDIMENTOS; i++)
+        {
+            strcpy(fp->consulta[i].usernameProfisional, "Vazio");
+            strcpy(fp->consulta[i].usernameAtendente, "Vazio");
+            strcpy(fp->consulta[i].nomeTutor, "Vazio");
+            strcpy(fp->consulta[i].contatoResponsavel, "Vazio");
+            strcpy(fp->consulta[i].enderecoResponsavel, "Vazio");
+            strcpy(fp->consulta[i].nomeAnimal, "Vazio");
+            fp->consulta[i].porteAnimal = 0; // Sem porte
+            strcpy(fp->consulta[i].status, "Vago");
+            fp->consulta[i].valor = 0.0;
+            fp->consulta[i].consultaVeterinaria = 0;
+            fp->consulta[i].banho = 0;
+            fp->consulta[i].tosa = 0;
+            strcpy(fp->consulta[i].detalhes, "Vazio");
+            fp->consulta[i].horario = i + 1; // Horários de 1 a 8
+            fp->consulta[i].concluida = 0;
+
+            insere_FilaPrio(fp, i + 1);
+        }
+    }
+    return fp;
+}
+
+void libera_FilaPrio(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        return; // Se a fila for nula, não há nada para liberar.
+    }
+
+    // Libera o array de consultas
+    if (fila_Consultas->consulta != NULL)
+    {
+        free(fila_Consultas->consulta);
+    }
+
+    // Libera o array de prioridades
+    if (fila_Consultas->prioridade != NULL)
+    {
+        free(fila_Consultas->prioridade);
+    }
+
+    // Libera a estrutura principal da fila
+    free(fila_Consultas);
+}
+
+int estaCheia_FilaPrio(Consultas *fila_Consultas)
+{
+    // -1 erro, 1 está cheia, 0 não está cheia.
+    if (fila_Consultas == NULL)
+    {
+        return -1;
+    }
+
+    return (fila_Consultas->qtd == MAX_ATENDIMENTOS);
+}
+
+int estaVazia_FilaPrio(Consultas *fila_Consultas)
+{
+    // -1 erro, 1 está vazia, 0 possui elementos;
+    if (fila_Consultas == NULL)
+    {
+        return -1;
+    }
+    return (fila_Consultas->qtd == 0);
+}
+
+void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
+{
+    int filho, pai;
+
+    // Começamos do último elemento inserido e subimos até a raiz
+    filho = ultimo_Elemento;
+    pai = (filho - 2) / 2; // Cálculo do índice do pai
+
+    // Enquanto o filho tiver prioridade MAIOR que o pai, trocamos e continuamos subindo
+    while ((filho > 0) && fila_Consultas->prioridade[filho] < fila_Consultas->prioridade[pai])
+    {
+        // Troca os elementos
+        Consulta consultaTemp = fila_Consultas->consulta[filho];
+        int temp = fila_Consultas->prioridade[filho];
+
+        fila_Consultas->consulta[filho] = fila_Consultas->consulta[pai];
+        fila_Consultas->prioridade[filho] = fila_Consultas->prioridade[pai];
+
+        fila_Consultas->consulta[pai] = consultaTemp;
+        fila_Consultas->prioridade[pai] = temp;
+
+        // Atualiza os índices para a próxima iteração
+        filho = pai;
+        pai = (filho - 2) / 2;
+    }
+}
+
+int insere_FilaPrio(Consultas *fila_Consultas, int horario)
+{
+    if (fila_Consultas == NULL)
+        return 0;
+    if (fila_Consultas->qtd == MAX_ATENDIMENTOS)
+    {
+        printf("\nEste dia de atendimentos esta lotado :c\n");
+        return 0;
+    }
+    fila_Consultas->qtd++;
+    fila_Consultas->prioridade[fila_Consultas->qtd - 1] = horario;
+
+    // strcpy(fp->dados[fp->qtd].nome, nome);
+    // fp->dados[fp->qtd].prio = prio;
+    validarFila(fila_Consultas, fila_Consultas->qtd - 1);
+    // promoverElemento (fp, fp->qtd);
+    return 1; // Sucesso.
+}
+
+void rebaixarElemento(Consultas *fp, int pai)
+{
+    int temp;
+    int filho = 2 * pai + 1;
+    while (filho < fp->qtd)
+    {
+        if (filho < fp->qtd - 1)
+            if (fp->prioridade[filho] > fp->prioridade[filho + 1])
+                filho++;
+        if (fp->prioridade[pai] <= fp->prioridade[filho])
+            break;
+
+        temp = fp->prioridade[pai];
+        fp->prioridade[pai] = fp->prioridade[filho];
+        fp->prioridade[filho] = temp;
+
+        pai = filho;
+        filho = 2 * pai + 1;
+    }
+}
+
+int remove_FilaPrio(Consultas *fp)
+{
+    if (fp == NULL)
+        return 0;
+    if (fp->qtd == 0)
+    {
+        printf("Todas as consultas do dia foram realizadas!");
+        return 0;
+    }
+
+    // Marca a consulta da prioridade atual da lista como concluido.
+    if (realizarCheckin(fp))
+    {
+        fp->qtd--;
+        fp->prioridade[0] = fp->prioridade[fp->qtd];
+        rebaixarElemento(fp, 0);
+        printf("Checkin realizado!\n");
+        return 1;
+    }
+    printf("Erro ao realizar checkin!\n");
+    return 0;
+}
+
+int realizarCheckin(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
+        return 0;
+    int i;
+
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
+        {
+            fila_Consultas->consulta[i].concluida = 1;
+            strcpy(fila_Consultas->consulta[i].status, "Concluida");
+            return 1;
+        }
+    }
+    return 1;
+}
+
+void consulta_FilaPrio(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
+        return;
+    int i;
+
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
+        {
+            printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d, Prio: %d\n",
+                   fila_Consultas->consulta[i].horario,
+                   fila_Consultas->consulta[i].horario,
+                   fila_Consultas->consulta[i].nomeTutor,
+                   fila_Consultas->consulta[i].nomeAnimal,
+                   fila_Consultas->consulta[i].status,
+                   fila_Consultas->consulta[i].concluida,
+                   fila_Consultas->prioridade[0]);
+        }
+    }
+}
+
+void visualizar_FilaPrio(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        printf("Fila de consultas esta vazia ou nao existe.\n");
+        return;
+    }
+
+    printf("Lista de proximas Consultas (por prioridade de horarios):\n");
+    int i;
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d\n",
+               i + 1,
+               fila_Consultas->consulta[i].horario,
+               fila_Consultas->consulta[i].nomeTutor,
+               fila_Consultas->consulta[i].nomeAnimal,
+               fila_Consultas->consulta[i].status,
+               fila_Consultas->consulta[i].concluida);
+    }
+}
+
+int marcarConsulta(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        printf("Fila de consultas nao existe.\n");
+        return 0;
+    }
+
+    // Exibe horários livres
+    printf("\nHorarios Preenchidos: ");
+    int i, horarioEscolhido = -1;
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (strcmp(fila_Consultas->consulta[i].status, "Agendado") == 0 || fila_Consultas->consulta[i].concluida == 1)
+        {
+            printf(" %d ", fila_Consultas->consulta[i].horario);
+        }
+    }
+    // Solicita ao usuário o horário para marcar
+    printf("\nInforme o horario que deseja agendar (1 a 8): ");
+    scanf("%d", &horarioEscolhido);
+
+    // Verifica se o horário está disponível
+    if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") == 0 || fila_Consultas->consulta[horarioEscolhido - 1].concluida)
+    {
+        printf("Horario inválido ou já agendado.\n");
+        return 0;
+    }
+
+    // Coleta os dados da consulta
+    Consulta novaConsulta;
+    novaConsulta.horario = horarioEscolhido;
+    novaConsulta.concluida = 0; // Inicialmente, a consulta não está concluída
+
+    printf("Informe o nome do profissional: ");
+    scanf(" %[^\n]s", novaConsulta.usernameProfisional);
+
+    printf("Informe o nome do atendente: ");
+    scanf(" %[^\n]s", novaConsulta.usernameAtendente);
+
+    printf("Informe o nome do tutor: ");
+    scanf(" %[^\n]s", novaConsulta.nomeTutor);
+
+    printf("Informe o telefone de contato: ");
+    scanf(" %[^\n]s", novaConsulta.contatoResponsavel);
+
+    printf("Informe o endereco do tutor: ");
+    scanf(" %[^\n]s", novaConsulta.enderecoResponsavel);
+
+    printf("Informe o nome do animal: ");
+    scanf(" %[^\n]s", novaConsulta.nomeAnimal);
+
+    printf("Informe o porte do animal (1 - Pequeno, 2 - Médio, 3 - Grande): ");
+    scanf("%d", &novaConsulta.porteAnimal);
+
+    printf("Informe o valor da consulta: ");
+    scanf("%f", &novaConsulta.valor);
+
+    printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.consultaVeterinaria);
+
+    printf("É um banho? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.banho);
+
+    printf("É uma tosa? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.tosa);
+
+    printf("Informe os detalhes da consulta: ");
+    scanf(" %[^\n]s", novaConsulta.detalhes);
+
+    // Atualiza o status da consulta e insere na fila
+    strcpy(novaConsulta.status, "Agendado");
+    fila_Consultas->consulta[horarioEscolhido - 1] = novaConsulta;
+    printf("Consulta agendada com sucesso no horário %d!\n", horarioEscolhido);
+
+    return 1; // Sucesso
+}
+
+int atualizarConsulta(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        printf("Fila de consultas nao existe.\n");
+        return 0;
+    }
+
+    // Exibe horários livres
+    printf("\nHorarios agendados: ");
+    int i, horarioEscolhido = -1;
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (strcmp(fila_Consultas->consulta[i].status, "Agendado") == 0)
+        {
+            printf(" %d ", fila_Consultas->consulta[i].horario);
+        }
+    }
+
+    // Solicita ao usuário o horário para marcar
+    printf("\nInforme o horario que deseja agendar (1 a 8): ");
+    scanf("%d", &horarioEscolhido);
+
+    // Verifica se o horário está disponível
+    if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") != 0)
+    {
+        printf("Horario inválido, está livre ou concluído.\n");
+        return 0;
+    }
+
+    // Coleta os novos dados da consulta
+    Consulta novaConsulta;
+    novaConsulta.horario = horarioEscolhido;
+    novaConsulta.concluida = 0; // Inicialmente, a consulta não está concluída
+
+    printf("Informe o nome do profissional: ");
+    scanf(" %[^\n]s", novaConsulta.usernameProfisional);
+
+    printf("Informe o nome do atendente: ");
+    scanf(" %[^\n]s", novaConsulta.usernameAtendente);
+
+    printf("Informe o nome do tutor: ");
+    scanf(" %[^\n]s", novaConsulta.nomeTutor);
+
+    printf("Informe o telefone de contato: ");
+    scanf(" %[^\n]s", novaConsulta.contatoResponsavel);
+
+    printf("Informe o endereco do tutor: ");
+    scanf(" %[^\n]s", novaConsulta.enderecoResponsavel);
+
+    printf("Informe o nome do animal: ");
+    scanf(" %[^\n]s", novaConsulta.nomeAnimal);
+
+    printf("Informe o porte do animal (1 - Pequeno, 2 - Médio, 3 - Grande): ");
+    scanf("%d", &novaConsulta.porteAnimal);
+
+    printf("Informe o valor da consulta: ");
+    scanf("%f", &novaConsulta.valor);
+
+    printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.consultaVeterinaria);
+
+    printf("É um banho? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.banho);
+
+    printf("É uma tosa? (1 - Sim, 0 - Não): ");
+    scanf("%d", &novaConsulta.tosa);
+
+    printf("Informe os detalhes da consulta: ");
+    scanf(" %[^\n]s", novaConsulta.detalhes);
+
+    // Atualiza o status da consulta e insere na fila
+    strcpy(novaConsulta.status, "Agendado");
+    fila_Consultas->consulta[horarioEscolhido - 1] = novaConsulta;
+    printf("Consulta atualizada com sucesso no horario %d!\n", horarioEscolhido);
+
+    return 1; // Sucesso
+}
+
+int desmarcarConsulta(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        printf("\nFila de consultas nao existe.\n");
+        return 0;
+    }
+
+    // Exibe horários livres
+    printf("\nHorarios agendados:");
+    int i, horarioEscolhido = -1;
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (strcmp(fila_Consultas->consulta[i].status, "Agendado") == 0)
+        {
+            printf(" %d ", fila_Consultas->consulta[i].horario);
+        }
+    }
+
+    // Solicita ao usuário o horário para marcar
+    printf("\nInforme o horario que deseja desmarcar (1 a 8): ");
+    scanf("%d", &horarioEscolhido);
+
+    // Verifica se o horário está disponível
+    if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") != 0)
+    {
+        printf("Horario inválido, está livre ou concluído.\n");
+        return 0;
+    }
+
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].usernameProfisional, "Vazio");
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].usernameAtendente, "Vazio");
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].nomeTutor, "Vazio");
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].contatoResponsavel, "Vazio");
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].enderecoResponsavel, "Vazio");
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].nomeAnimal, "Vazio");
+    fila_Consultas->consulta[horarioEscolhido - 1].porteAnimal = 0; // Sem porte
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].status, "Vago");
+    fila_Consultas->consulta[horarioEscolhido - 1].valor = 0.0;
+    fila_Consultas->consulta[horarioEscolhido - 1].consultaVeterinaria = 0;
+    fila_Consultas->consulta[horarioEscolhido - 1].banho = 0;
+    fila_Consultas->consulta[horarioEscolhido - 1].tosa = 0;
+    strcpy(fila_Consultas->consulta[horarioEscolhido - 1].detalhes, "Vazio");
+    fila_Consultas->consulta[horarioEscolhido - 1].horario = horarioEscolhido; // Horários de 1 a 8
+    fila_Consultas->consulta[horarioEscolhido - 1].concluida = 0;
+    printf("Consulta desmarcada com sucesso no horario %d!\n", horarioEscolhido);
+    return 1; // Sucesso
 }
