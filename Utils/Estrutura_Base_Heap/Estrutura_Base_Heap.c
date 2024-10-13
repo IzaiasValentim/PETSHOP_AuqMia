@@ -250,6 +250,7 @@ int remove_FilaPrio(Consultas *fp)
         fp->prioridade[0] = fp->prioridade[fp->qtd];
         rebaixarElemento(fp, 0);
         return 1;
+        printf("Checkin realizado!");
     }
     return 0;
 }
@@ -329,7 +330,7 @@ int marcarConsulta(Consultas *fila_Consultas)
     int i, horarioEscolhido = -1;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
-        if (strcmp(fila_Consultas->consulta[i].status, "Agendado") == 0)
+        if (strcmp(fila_Consultas->consulta[i].status, "Agendado") == 0 && fila_Consultas->consulta[i].concluida)
         {
             printf(" %d ", fila_Consultas->consulta[i].horario);
         }
@@ -340,7 +341,7 @@ int marcarConsulta(Consultas *fila_Consultas)
     scanf("%d", &horarioEscolhido);
 
     // Verifica se o horário está disponível
-    if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") == 0)
+    if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") == 0 || fila_Consultas->consulta[horarioEscolhido - 1].concluida)
     {
         printf("Horario inválido ou já agendado.\n");
         return 0;
