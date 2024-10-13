@@ -466,7 +466,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
     } while (opcao != 4);
 }
 
-void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
+void menuVeterinario(Hash *usuarios, Usuario *logado)
 {
     int opcao;
     do
@@ -475,26 +475,45 @@ void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
         printf("1. Cadastrar dia de atendimento\n");
         printf("2. Realizar checkin\n"); // Agora não
         printf("3. Visualizar atendimentos\n");
-        printf("4. Atualizar minhas informações.\n");
-        printf("5. Sair\n");
+        printf("4. Visualizar todas as consultas por dia\n");
+        printf("5. Atualizar minhas informações.\n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
-
+        Atendimento *atendimentoBusca = (Atendimento *)malloc(sizeof(Atendimento));
         switch (opcao)
         {
         case 1:
             // printf("Cadastrar dia de atendimento...\n");
-            cadastrarAtendimento(raiz, logado);
+            cadastrarAtendimento(logado->arvoreAtendimentos, logado);
             break;
         case 2:
-            printf("Realizar checkin...\n");
-            // Lógica para realizar atendimento veterinário.
+            setarDataNoAtendimento(atendimentoBusca);
+            if (consulta_ArvBin(logado->arvoreAtendimentos, atendimentoBusca))
+            {
+                remove_FilaPrio(atendimentoBusca->consultas);
+            }
+            else
+            {
+                printf("\nNão existe um atendimento neste dia!\n");
+            }
             break;
         case 3:
             printf("Visualizar atendimentos...\n");
-            preordem_ArvBin(raiz);
+            preordem_ArvBin(logado->arvoreAtendimentos);
             break;
         case 4:
+            solicitarDiaDeAtendimento(atendimentoBusca);
+            if (consulta_ArvBin(logado->arvoreAtendimentos, atendimentoBusca))
+            {
+                visualizar_FilaPrio(atendimentoBusca->consultas);
+            }
+            else
+            {
+                printf("\nNão existe um atendimento neste dia!\n");
+            }
+            break;
+        case 5:
             if (atualizarUsuario(usuarios, logado))
             {
                 printf("Atualização realizada com sucesso!\n");
@@ -505,13 +524,14 @@ void menuVeterinario(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
             }
             opcao = 0;
             break;
-        case 5:
+        case 6:
             printf("Saindo do menu veterinário...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 5);
+        free(atendimentoBusca);
+    } while (opcao != 6);
 }
 
 void menuTosador(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
