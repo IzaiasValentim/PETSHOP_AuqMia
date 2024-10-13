@@ -534,7 +534,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
     } while (opcao != 6);
 }
 
-void menuTosador(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
+void menuTosador(Hash *usuarios, Usuario *logado)
 {
     int opcao;
     do
@@ -543,27 +543,46 @@ void menuTosador(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
         printf("1. Cadastrar dia de atendimento\n");
         printf("2. Realizar checkin\n");
         printf("3. Visualizar atendimentos\n");
-        printf("4. Atualizar minhas informações.\n");
-        printf("5. Sair\n");
+        printf("4. Visualizar todas as consultas por dia\n");
+        printf("5. Atualizar minhas informações.\n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
-
+        Atendimento *atendimentoBusca = (Atendimento *)malloc(sizeof(Atendimento));
         switch (opcao)
         {
         case 1:
-            printf("Cadastrar dia de atendimento...\n");
+            cadastrarAtendimento(logado->arvoreAtendimentos, logado);
             // Replicar a lógica de cadastro similar à realizada no menu veterinário.
             break;
         case 2:
-            printf("Realizar checkin...\n");
-            // Lógica para realizar checkin do atendimento banho/tosa.
+            setarDataNoAtendimento(atendimentoBusca);
+            if (consulta_ArvBin(logado->arvoreAtendimentos, atendimentoBusca))
+            {
+                remove_FilaPrio(atendimentoBusca->consultas);
+            }
+            else
+            {
+                printf("\nNão existe um atendimento neste dia!\n");
+            }
             break;
         case 3:
             printf("Visualizar atendimentos...\n");
             // Visualizar banho/tosa de acordo com filtro de dia.
-            // Replicar a visualização do atendimento similar à realizada no meu veterinário.
+            preordem_ArvBin(logado->arvoreAtendimentos);
             break;
         case 4:
+            solicitarDiaDeAtendimento(atendimentoBusca);
+            if (consulta_ArvBin(logado->arvoreAtendimentos, atendimentoBusca))
+            {
+                visualizar_FilaPrio(atendimentoBusca->consultas);
+            }
+            else
+            {
+                printf("Não existe um atendimento neste dia!\n");
+            }
+            break;
+        case 5:
             if (atualizarUsuario(usuarios, logado))
             {
                 printf("Atualização realizada com sucesso!\n");
@@ -574,13 +593,14 @@ void menuTosador(Hash *usuarios, Atendimentos *raiz, Usuario *logado)
             }
             opcao = 0;
             break;
-        case 5:
+        case 6:
             printf("Saindo do menu banho/tosa...\n");
             break;
         default:
             printf("Opcao invalida!\n");
         }
-    } while (opcao != 5);
+        free(atendimentoBusca);
+    } while (opcao != 6);
 }
 
 void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
