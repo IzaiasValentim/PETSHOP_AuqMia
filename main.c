@@ -776,7 +776,16 @@ int inserirUsuario(Hash *ha, Usuario usuario)
 {
     if (ha == NULL || ha->quantidade == ha->TAM_TAB)
         return 0;
-
+    if (usuario.tosador || usuario.veterinario)
+    {
+        if (usuario.arvoreAtendimentos = cria_ArvBin())
+        {
+        }
+        else
+        {
+            printf("Erro ao relacionar atendimento a usuario");
+        }
+    }
     int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
 
@@ -941,8 +950,8 @@ int validarEmail(Hash *ha, char *email)
         printf("O email deve ser menor que 80 caracteres.\n");
         return 1;
     }
-
-    for (int i = 0; i < ha->TAM_TAB; i++)
+    int i;
+    for (i = 0; i < ha->TAM_TAB; i++)
     {
         Usuario *atual = ha->usuarios[i]; // Aponta para o primeiro usuário na posição i
         while (atual != NULL)
@@ -1194,6 +1203,56 @@ int atualizarCargoDeFuncionario(Hash *ha, char *username)
     return 0; // Usuário não encontrado
 }
 
+Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados)
+{
+    int capacidade = 10;
+    *qtd_resultados = 0;
+    Usuario *resultados = malloc(capacidade * sizeof(Usuario));
+
+    int i;
+    for (i = 0; i < tabela->TAM_TAB; i++)
+    {
+        Usuario *atual = tabela->usuarios[i];
+        while (atual != NULL)
+        {
+            if (atual->veterinario || atual->tosador)
+            {
+                if (*qtd_resultados >= capacidade)
+                {
+                    capacidade *= 2;
+                    resultados = realloc(resultados, capacidade * sizeof(Usuario));
+                }
+                resultados[*qtd_resultados] = *atual; // Copia o usuário para o array
+                (*qtd_resultados)++;
+            }
+            atual = atual->prox;
+        }
+    }
+    return resultados;
+}
+
+Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, int veterinario)
+{
+    printf("Nome dos profissionais: \n");
+    int i;
+    for (i = 0; i < quantidade; i++)
+    {
+        if (tosador && usuarios[i].tosador)
+        {
+            printf("%d - Tosador - %s\n", i + 1, usuarios[i].username);
+        }
+        if (veterinario && usuarios[i].veterinario)
+        {
+            printf("%d - Veterinario - %s\n", i + 1, usuarios[i].username);
+        }
+    }
+    int escolha = 0;
+    printf("Informe a escolha: ");
+    scanf("%d", &escolha);
+    // Retorna um usuário vazio se nenhum profissional for encontrado
+    return usuarios[escolha - 1];
+}
+
 Atendimentos *cria_ArvBin()
 {
     Atendimentos *raiz = (Atendimentos *)malloc(sizeof(Atendimentos));
@@ -1253,6 +1312,12 @@ void preordem_ArvBin(Atendimentos *raiz)
         preordem_ArvBin(&((*raiz)->esq));
         preordem_ArvBin(&((*raiz)->dir));
     }
+}
+
+void solicitarDiaDeAtendimento(Atendimento *atendimento)
+{
+    printf("\nDigite a data do atendimento (dia mes ano): ");
+    scanf("%d %d %d", &atendimento->dia, &atendimento->mes, &atendimento->ano);
 }
 
 int comparaDatas(Atendimento a1, Atendimento a2)
@@ -1373,7 +1438,7 @@ int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
 
     // Você pode adicionar mais campos aqui conforme necessário.
     // Exemplo: novoAtendimento.descricao, novoAtendimento.hora, etc.
-
+    novoAtendimento.consultas = cria_FilaPrio();
     // Insere o novo atendimento na árvore binária
     if (insere_ArvBin(raiz, novoAtendimento))
     {
@@ -1386,7 +1451,6 @@ int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
         return 0; // Falha ao cadastrar
     }
 }
-
 
 Consultas *cria_FilaPrio()
 {
