@@ -163,16 +163,7 @@ int desmarcarConsulta(Consultas *fila_Consultas);
 
 // Funções auxiliares
 int comparaDatas(Atendimento a1, Atendimento a2);
-void setarDataNoAtendimento(Atendimento *atendimento)
-{
-
-    time_t t = time(NULL);              // Obtém o tempo atual
-    struct tm *tm_info = localtime(&t); // Converte para a estrutura tm
-
-    atendimento->dia = tm_info->tm_mday;
-    atendimento->mes = tm_info->tm_mon + 1;
-    atendimento->ano = tm_info->tm_year + 1900;
-}
+void setarDataNoAtendimento(Atendimento *atendimento);
 
 int main()
 {
@@ -1909,4 +1900,15 @@ int desmarcarConsulta(Consultas *fila_Consultas)
     fila_Consultas->consulta[horarioEscolhido - 1].concluida = 0;
     printf("Consulta desmarcada com sucesso no horario %d!\n", horarioEscolhido);
     return 1; // Sucesso
+}
+
+void setarDataNoAtendimento(Atendimento *atendimento)
+{
+
+    time_t t = time(NULL);              // Obtém o tempo atual
+    struct tm *tm_info = localtime(&t); // Converte para a estrutura tm
+
+    atendimento->dia = tm_info->tm_mday;
+    atendimento->mes = tm_info->tm_mon + 1;
+    atendimento->ano = tm_info->tm_year + 1900;
 }
