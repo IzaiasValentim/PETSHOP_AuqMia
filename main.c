@@ -173,20 +173,20 @@ void setarDataNoAtendimento(Atendimento *atendimento)
     atendimento->mes = tm_info->tm_mon + 1;
     atendimento->ano = tm_info->tm_year + 1900;
 }
+
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
-
     // Lista de usuários cadastrados (para exemplo)
     Usuario usuarios[] = {
-        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL},
-        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0, NULL},
-        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0, NULL},
-        {"izaias@petshop.com", "Luis Izaias", "12345", 0, 0, 1, 0, NULL},
-        {"izaias2@petshop.com", "Izaias Luis", "12345", 0, 0, 1, 0, NULL},
-        {"Tulio@petshop.com", "Tulio", "12345", 0, 0, 1, 0, NULL},
-        {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL},
-        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL}};
+        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL, NULL},
+        {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0, NULL, NULL},
+        {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0, NULL, NULL},
+        {"izaias@petshop.com", "Luis Izaias", "12345", 0, 0, 1, 0, NULL, NULL},
+        {"izaias2@petshop.com", "Izaias Luis", "12345", 0, 0, 1, 0, NULL, NULL},
+        {"Tulio@petshop.com", "Tulio", "12345", 0, 0, 1, 0, NULL, NULL},
+        {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL, NULL},
+        {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL, NULL}};
 
     int totalUsuarios = 17;
 
@@ -201,10 +201,6 @@ int main()
     inserirUsuario(Usuarios, usuarios[7]);
 
     Usuario usuarioLogado;
-
-    Atendimentos *atendimentosVeterinario = cria_ArvBin();
-    Atendimentos *atendimentoTosador = cria_ArvBin();
-
     int continuar = 1; // Variável para controlar o loop do sistema
 
     // Loop principal do sistema
@@ -219,15 +215,17 @@ int main()
             // Verifica o tipo de usuário e exibe o menu correspondente
             if (usuarioLogado.vendedor)
             {
-                menuVendedor(Usuarios, &usuarioLogado);
+                int qntConsultores = 0;
+                Usuario *consultores = usuariosVeterinariosTosadores(Usuarios, &qntConsultores);
+                menuVendedor(Usuarios, &usuarioLogado, consultores, qntConsultores);
             }
             else if (usuarioLogado.veterinario)
             {
-                menuVeterinario(Usuarios, atendimentosVeterinario, &usuarioLogado);
+                menuVeterinario(Usuarios, &usuarioLogado);
             }
             else if (usuarioLogado.tosador)
             {
-                menuTosador(Usuarios,atendimentoTosador, &usuarioLogado);
+                menuTosador(Usuarios, &usuarioLogado);
             }
             else if (usuarioLogado.gerente)
             {
@@ -266,12 +264,12 @@ void boasVindas()
     printf("====      Realize o login :      ====\n\n");
 }
 
-void menuVendedor(Hash *usuarios, Usuario *logado)
+void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int quantidadeConsultores)
 {
     int opcao;
     do
     {
-        printf("=== Menu Vendedor ===\n");
+        printf("\n=== Menu Vendedor ===\n");
         printf("1. Atendimento veterinário\n");
         printf("2. Banho/Tosa\n");
         printf("3. Atualizar minhas informações \n");
@@ -292,25 +290,71 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
             scanf("%d", &opcao);
             if (opcao == 1)
             {
-                printf("Horarios disponiveis\n");
+                printf("Horarios disponiveis: \n");
+                Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    visualizar_FilaPrio(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
                 opcao = 0;
                 break;
             }
             else if (opcao == 2)
             {
-                printf("Marcar atendiemnto \n");
+                printf("Horarios disponiveis: \n");
+                Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    marcarConsulta(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
                 opcao = 0;
                 break;
             }
             else if (opcao == 3)
             {
-                printf("Desmarcar atendimento \n");
+                printf("Horarios disponiveis: \n");
+                Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    desmarcarConsulta(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
+
                 opcao = 0;
                 break;
             }
             else if (opcao == 4)
             {
-                printf("Alterar atendiemnto \n");
+                printf("Horarios disponiveis: \n");
+                Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    atualizarConsulta(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
+
                 opcao = 0;
                 break;
             }
@@ -331,25 +375,68 @@ void menuVendedor(Hash *usuarios, Usuario *logado)
             scanf("%d", &opcao);
             if (opcao == 1)
             {
-                printf("Horarios disponiveis\n");
+                Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(tosador.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    visualizar_FilaPrio(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
                 opcao = 0;
                 break;
             }
             else if (opcao == 2)
             {
-                printf("Marcar Marcar Banho/Tosa: \n");
+                Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(tosador.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    marcarConsulta(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
                 opcao = 0;
                 break;
             }
             else if (opcao == 3)
             {
-                printf("Desmarcar Banho/Tosa \n");
-                opcao = 0;
+                printf("Horarios disponiveis: \n");
+                Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(tosador.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    desmarcarConsulta(atendimentoBusca.consultas);
+                    opcao = 0;
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
+
                 break;
             }
             else if (opcao == 4)
             {
-                printf("Alterar Banho/Tosa \n");
+                printf("Horarios disponiveis: \n");
+                Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
+                Atendimento atendimentoBusca;
+                solicitarDiaDeAtendimento(&atendimentoBusca);
+                if (consulta_ArvBin(tosador.arvoreAtendimentos, &atendimentoBusca))
+                {
+                    atualizarConsulta(atendimentoBusca.consultas);
+                }
+                else
+                {
+                    printf("\nNão existe um atendimento neste dia!\n");
+                }
                 opcao = 0;
                 break;
             }
