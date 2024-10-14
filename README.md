@@ -2,17 +2,10 @@
 
 ### *AuqMia foi desenvolvido em linguagem C, como projeto avaliativo para a disciplina de Laboratório de Algoritmos e Estrutura de Dados II, sob orientação do docente Kennedy Reurison Lopes.*
 1. Resumo:
-   - *Considerando o escopo da segunda entrega.*
-   - *O projeto consiste no desenvolvimento de um sistema de gerenciamento para
-um Pet Shop chamado AuqMia, implementado em linguagem C. O objetivo é permitir a atividade do Pet Shop com um sistema comercial que permitirá o login e gerência dos usuários, disponibilização de consultas para banho e tosa ou atendimento veterinário em geral. Atualmente o sistema está no escopo da segunda entrega, onde foi aplicada a estrutura de dados Tabela Hash para a organização dos usuários e otimização das consulta pelo seu 'username'. Também encontram-se implementadas as funções de criação, atualização e remoção de usuário. Abaixo, segue alguns protótipos das funções de CRUD implementadas que são acessadas diretamente ou indiretamente pelos menus dos usuários.*
+   - *Considerando o escopo da terceira entrega.*
+   <p>&emsp;O projeto consiste no desenvolvimento de um sistema de gerenciamento para o Pet Shop AuqMia, implementado em linguagem C. O objetivo é criar um sistema comercial que permita o login e a gestão de usuários, além de disponibilizar agendamentos para serviços de banho e tosa ou atendimento veterinário. Atualmente, o sistema está na fase da terceira entrega, onde foram aplicadas três estruturas de dados para otimizar funcionalidades específicas: a Tabela Hash, a Árvore Binária de Busca e a Heap Binária. A seguir serão descritas algumas das motivações para a escolha de tais estruturas de dados:</p>
+   <p>&emsp;A Tabela Hash foi escolhida para gerenciar os usuários, proporcionando uma busca eficiente pelo nome de usuário ('username'), o que agiliza operações como o login. A Árvore Binária de Busca foi implementada para organizar os plantões de atendimento, permitindo uma busca rápida e eficiente por atendimentos com base na data. A inserção de novos atendimentos nessa estrutura mantém a ordem cronológica, oferecendo flexibilidade para futuras expansões, como a estruturação das consultas. Por fim, a Heap Binária é utilizada para garantir que as consultas sejam realizadas na ordem correta de prioridade, com os horários mais próximos (valores menores) recebendo maior prioridade.</p>
 
-      Tabela Hash, funções de CRUD:
-      -  (create) int cadastrarUsuario(Hash *ha);
-      -  (read)   void visualizarTodosUsuarios(Hash *usuarios);
-      -  (read)   int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
-      -  (delet)  int deletarUsuario(Hash *ha, Usuario *gerenteLogado);
-      -  (update) int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
-      -  (update) int atualizarCargoDeFuncionario(Hash *ha, char *username);
 2. Execução, na pasta raiz do projeto:
    - > Compilador utilizado: MinGW.org GCC-6.3.0-1
    - > Compilação do arquivo .c: gcc main.c -o main.exe
