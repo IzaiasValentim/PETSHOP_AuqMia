@@ -1,5 +1,9 @@
 ## <div align="center">🐾 Sistema de PetShop AuqMia 🐾</div>
-
+                                                            へ   AuqMia System  ╱|       
+                                                        ૮ -  ՛)        ♡      (` - 7    
+                                                        /  ⁻ ៸|                |、⁻〵     
+                                                     乀(_,ل ل   --^_--^-       じし_,)ノ  
+                                                    --^___--^--          _^--^--_--__^^--
 ### *AuqMia foi desenvolvido em linguagem C, como projeto avaliativo para a disciplina de Laboratório de Algoritmos e Estrutura de Dados II, sob orientação do docente Kennedy Reurison Lopes.*
 1. Resumo:
    - *Considerando o escopo da terceira entrega.*
