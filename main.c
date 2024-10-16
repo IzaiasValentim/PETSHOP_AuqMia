@@ -1116,7 +1116,7 @@ int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
             return 0;
         }
     }
-
+    /*
     printf("Username, 0 se não quiser atualizar: ");
     scanf("%s", usuarioAtualizado.username);
     Usuario mock;
@@ -1132,19 +1132,25 @@ int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
             return 0;
         }
     }
-
+    */
     printf("Senha: ");
     scanf("%s", usuarioAtualizado.senha);
-    if (deletarUsuarioSimplificado(ha, *usuarioAntigo))
+
+    int chave = chaveTabelaPorUsername(usuarioAntigo->username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos]; // Aponta para o primeiro usuário na posição
+
+    // Percorre a lista encadeada de usuários na posição calculada
+    while (atual != NULL)
     {
-        if (inserirUsuario(ha, usuarioAtualizado))
+        // Verifica se o usuário foi encontrado pelo username
+        if (strcmp(atual->username, usuarioAntigo->username) == 0)
         {
-            return 1;
+            *atual = usuarioAtualizado;
+            return 1; // Cargo atualizado com sucesso
         }
-        else
-        {
-            return 0;
-        }
+        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
     }
     return 0;
 }
