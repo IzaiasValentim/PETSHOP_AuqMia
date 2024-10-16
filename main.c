@@ -6,7 +6,6 @@
 
 #define MAX_ATENDIMENTOS 8
 
-// Implementação Árvore Binária:
 typedef struct consulta
 {
     char usernameProfisional[50];
@@ -43,18 +42,16 @@ typedef struct atendimento
     Consultas *consultas;
 } Atendimento;
 
-// Cada usuário terá sua árvore binária com seus atendimentos. Assim não acontece conflito.
+
 typedef struct NO *Atendimentos;
 
 struct NO
 {
-    // A inserção será ponderada de acordo com a data;
     Atendimento atendimento;
     struct NO *esq;
     struct NO *dir;
 };
 
-// Estrutura para armazenar os dados do usuário
 typedef struct Usuario
 {
     char email[50];
@@ -104,7 +101,7 @@ Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, i
 // Funções da nossa Árvore Binária e Atendimentos.
 Atendimentos *cria_ArvBin();
 
-// Funções auxiliares para inserção/consulta de um atendimento
+// Funções auxiliares para inserçã|consulta de um atendimento
 int comparaDatas(Atendimento a1, Atendimento a2);
 void setarDataNoAtendimento(Atendimento *atendimento);
 
@@ -119,20 +116,20 @@ void solicitarDiaDeAtendimento(Atendimento *atendimento);
 int remove_ArvBin(Atendimentos *raiz, int valor);
 
 // Funções Heap|Consultas
-Consultas *cria_FilaPrio(); // Cria a fila de prioridade com o array de consultas em estado de consultas vagas.
+Consultas *cria_FilaPrio(); 
 void libera_FilaPrio(Consultas *fila_Consultas);
-int insere_FilaPrio(Consultas *fila_Consultas, int horario);      // Adiciona um horário de atendimento à fila.
-void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); // Função complementar de inserção.
+int insere_FilaPrio(Consultas *fila_Consultas, int horario);      
+void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); 
 int marcarConsulta(Consultas *fila_Consultas);
-void consulta_FilaPrio(Consultas *fila_Consultas);   // Retorna a próxima consulta.
-void visualizar_FilaPrio(Consultas *fila_Consultas); // Retorna a lista total.
+void consulta_FilaPrio(Consultas *fila_Consultas);  
+void visualizar_FilaPrio(Consultas *fila_Consultas); 
 int atualizarConsulta(Consultas *fila_Consultas);
-int remove_FilaPrio(Consultas *fila_Consultas);            // Finaliza a próxima consulta e realiza o checkin.
-void rebaixarElemento(Consultas *fila_Consultas, int pai); // Função complementar de remoção.
-int realizarCheckin(Consultas *fila_Consultas);            // Marca a próxima consulta da lista como Concluída e a Remove a prioridade. Mas a consulta ainda permance na lista.
+int remove_FilaPrio(Consultas *fila_Consultas);            
+void rebaixarElemento(Consultas *fila_Consultas, int pai); 
+int realizarCheckin(Consultas *fila_Consultas);            
 int desmarcarConsulta(Consultas *fila_Consultas);
-int estaCheia_FilaPrio(Consultas *fila_Consultas); // Aux.
-int estaVazia_FilaPrio(Consultas *fila_Consultas); // Aux.
+int estaCheia_FilaPrio(Consultas *fila_Consultas); 
+int estaVazia_FilaPrio(Consultas *fila_Consultas); 
 
 int main()
 {
@@ -433,7 +430,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
     {
         printf("=== Menu Veterinário ===\n");
         printf("1. Cadastrar dia de atendimento\n");
-        printf("2. Realizar checkin\n"); // Agora não
+        printf("2. Realizar checkin\n"); 
         printf("3. Visualizar atendimentos\n");
         printf("4. Visualizar consultas do dia\n");
         printf("5. Consultar consultas por dia\n");
@@ -445,7 +442,6 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
         switch (opcao)
         {
         case 1:
-            // printf("Cadastrar dia de atendimento...\n");
             cadastrarAtendimento(logado->arvoreAtendimentos, logado);
             break;
         case 2:
@@ -513,7 +509,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
     {
         printf("=== Menu Tosador ===\n");
         printf("1. Cadastrar dia de atendimento\n");
-        printf("2. Realizar checkin\n"); // Agora não
+        printf("2. Realizar checkin\n");
         printf("3. Visualizar atendimentos\n");
         printf("4. Visualizar consultas do dia\n");
         printf("5. Consultar consultas por dia\n");
@@ -526,7 +522,6 @@ void menuTosador(Hash *usuarios, Usuario *logado)
         {
         case 1:
             cadastrarAtendimento(logado->arvoreAtendimentos, logado);
-            // Replicar a lógica de cadastro similar à realizada no menu veterinário.
             break;
         case 2:
             setarDataNoAtendimento(atendimentoBusca);
@@ -541,7 +536,6 @@ void menuTosador(Hash *usuarios, Usuario *logado)
             break;
         case 3:
             printf("Visualizar atendimentos...\n");
-            // Visualizar banho/tosa de acordo com filtro de dia.
             preordem_ArvBin(logado->arvoreAtendimentos);
             break;
         case 4:
@@ -1218,6 +1212,20 @@ int atualizarCargoDeFuncionario(Hash *ha, char *username)
     return 0; // Usuário não encontrado
 }
 
+/**
+ * Função: deletarUsuario
+ * ------------------------
+ * Remove um usuário da tabela hash com base no nome de usuário fornecido.
+ * A função verifica se o gerente logado está tentando excluir a si mesmo
+ * e se o usuário a ser removido existe na tabela. Se a remoção for confirmada,
+ * o usuário é removido da lista encadeada.
+ *
+ * @param ha: ponteiro para a tabela hash que contém os usuários.
+ * @param gerenteLogado: ponteiro para o usuário que está realizando a exclusão,
+ *                       para verificar se ele está tentando excluir a si mesmo.
+ * @return: 1 se o usuário foi removido com sucesso, 0 se o usuário não foi encontrado
+ *          ou se houve uma tentativa de exclusão do próprio gerente.
+ */
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
 {
     char username[50];
@@ -1279,18 +1287,15 @@ int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
 }
 
 /**
- * Função: deletarUsuario
- * ------------------------
- * Remove um usuário da tabela hash com base no nome de usuário fornecido.
- * A função verifica se o gerente logado está tentando excluir a si mesmo
- * e se o usuário a ser removido existe na tabela. Se a remoção for confirmada,
- * o usuário é removido da lista encadeada.
+ * Função: deletarUsuarioSimplificado
+ * -------------------------------------
+ * Remove um usuário da tabela hash, verificando o username e o email.
+ * A função percorre a lista encadeada na posição calculada para encontrar
+ * o usuário correspondente e, em caso de sucesso, o remove.
  *
- * @param ha: ponteiro para a tabela hash que contém os usuários.
- * @param gerenteLogado: ponteiro para o usuário que está realizando a exclusão,
- *                       para verificar se ele está tentando excluir a si mesmo.
- * @return: 1 se o usuário foi removido com sucesso, 0 se o usuário não foi encontrado
- *          ou se houve uma tentativa de exclusão do próprio gerente.
+ * @param ha: um ponteiro para a tabela hash onde o usuário está armazenado.
+ * @param usuario: a estrutura Usuario que contém as informações do usuário a ser removido.
+ * @return: 1 se o usuário foi deletado com sucesso, 0 se o usuário não foi encontrado ou a tabela hash for inválida.
  */
 int deletarUsuarioSimplificado(Hash *ha, Usuario usuario)
 {
@@ -1411,7 +1416,15 @@ Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, i
     return usuarios[escolha - 1];
 }
 
-// Incício implementação da Árvore Binária.
+/**
+ * Função: cria_ArvBin
+ * -----------------------
+ * Cria e inicializa uma nova árvore binária para armazenar atendimentos.
+ * Aloca memória para a estrutura Atendimentos e inicializa o ponteiro
+ * da raiz como NULL.
+ *
+ * @return: um ponteiro para a nova estrutura Atendimentos, ou NULL se a alocação falhar.
+ */
 Atendimentos *cria_ArvBin()
 {
     Atendimentos *raiz = (Atendimentos *)malloc(sizeof(Atendimentos));
@@ -1420,6 +1433,19 @@ Atendimentos *cria_ArvBin()
     return raiz;
 }
 
+/**
+ * Função: comparaDatas
+ * -----------------------
+ * Compara duas datas representadas pela estrutura Atendimento.
+ * Retorna -1 se a primeira data (a1) é anterior à segunda (a2),
+ * 1 se a primeira data é posterior à segunda, e 0 se as datas são iguais.
+ *
+ * @param a1: a primeira data a ser comparada.
+ * @param a2: a segunda data a ser comparada.
+ * @return: -1 se a1 é no passado em relação a a2, 
+ *          1 se a1 é no futuro em relação a a2, 
+ *          0 se as datas são iguais.
+ */
 int comparaDatas(Atendimento a1, Atendimento a2)
 {
     // -1 se a1 é no passado em relação a a2;
@@ -1447,6 +1473,16 @@ int comparaDatas(Atendimento a1, Atendimento a2)
     }
 }
 
+/**
+ * Função: setarDataNoAtendimento
+ * -----------------------
+ * Define a data atual no atendimento passado como parâmetro.
+ * A data é obtida a partir do sistema e é armazenada nas 
+ * variáveis dia, mês e ano da estrutura Atendimento.
+ *
+ * @param atendimento: um ponteiro para a estrutura Atendimento
+ *                    onde a data será definida.
+ */
 void setarDataNoAtendimento(Atendimento *atendimento)
 {
 
@@ -1458,6 +1494,19 @@ void setarDataNoAtendimento(Atendimento *atendimento)
     atendimento->ano = tm_info->tm_year + 1900;
 }
 
+/**
+ * Função: insere_ArvBin
+ * -----------------------
+ * Insere um novo atendimento na árvore binária de atendimentos.
+ * Se a raiz da árvore estiver vazia, o novo atendimento se torna 
+ * a raiz. Caso contrário, o novo atendimento é comparado com os 
+ * existentes para determinar sua posição na árvore. Se já existir 
+ * um atendimento com a mesma data, a inserção não é realizada.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
+ * @param atendimento: a estrutura Atendimento a ser inserida.
+ * @return: 1 se a inserção for bem-sucedida, 0 se não for.
+ */
 int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
 {
     if (raiz == NULL)
@@ -1504,6 +1553,18 @@ int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
     return 1;
 }
 
+/**
+ * Função: cadastrarAtendimento
+ * ------------------------------
+ * Cadastra um novo atendimento na árvore binária de atendimentos.
+ * Solicita os dados do atendimento ao usuário, incluindo a data e o 
+ * profissional responsável. Se o cadastro for bem-sucedido, 
+ * confirma a operação ao usuário.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
+ * @param usuario: um ponteiro para o usuário responsável pelo atendimento.
+ * @return: 1 se o cadastro for bem-sucedido, 0 se não for.
+ */
 int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
 {
     if (raiz == NULL)
@@ -1537,6 +1598,17 @@ int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
     }
 }
 
+/**
+ * Função: totalNO_ArvBin
+ * ------------------------
+ * Calcula o total de nós em uma árvore binária de atendimentos.
+ * A função percorre recursivamente a árvore, contando os nós
+ * nas subárvores esquerda e direita, e retorna a soma total
+ * dos nós.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
+ * @return: o número total de nós na árvore.
+ */
 int totalNO_ArvBin(Atendimentos *raiz)
 {
     if (raiz == NULL)
@@ -1548,6 +1620,16 @@ int totalNO_ArvBin(Atendimentos *raiz)
     return (total_esq + total_dir + 1);
 }
 
+/**
+ * Função: preordem_ArvBin
+ * ------------------------
+ * Realiza uma travessia em pré-ordem na árvore binária de atendimentos.
+ * Imprime o usuário responsável e a data de cada atendimento no formato 
+ * "username - dia/mês/ano". A função visita o nó atual antes de 
+ * percorrer as subárvores esquerda e direita.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
+ */
 void preordem_ArvBin(Atendimentos *raiz)
 {
     if (raiz == NULL)
@@ -1560,6 +1642,15 @@ void preordem_ArvBin(Atendimentos *raiz)
     }
 }
 
+/**
+ * Função: libera_NO
+ * ------------------
+ * Libera a memória ocupada por um nó da árvore binária e suas subárvores.
+ * A função é chamada recursivamente para liberar os nós da subárvore esquerda 
+ * e da subárvore direita antes de liberar o nó atual.
+ *
+ * @param no: um ponteiro para o nó da árvore a ser liberado.
+ */
 void libera_NO(struct NO *no)
 {
     if (no == NULL)
@@ -1571,6 +1662,15 @@ void libera_NO(struct NO *no)
     no = NULL;
 }
 
+/**
+ * Função: libera_ArvBin
+ * ----------------------
+ * Libera a memória ocupada por uma árvore binária de atendimentos.
+ * A função chama libera_NO para liberar todos os nós da árvore e, em seguida,
+ * libera a memória da raiz da árvore.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore a ser liberada.
+ */
 void libera_ArvBin(Atendimentos *raiz)
 {
     if (raiz == NULL)
@@ -1580,6 +1680,15 @@ void libera_ArvBin(Atendimentos *raiz)
     free(raiz);       // libera a raiz
 }
 
+/**
+ * Função: estaVazia_ArvBin
+ * --------------------------
+ * Verifica se a árvore binária de atendimentos está vazia.
+ * Retorna 1 se a árvore estiver vazia e 0 caso contrário.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore binária de atendimentos.
+ * @return: 1 se a árvore estiver vazia, 0 caso contrário.
+ */
 int estaVazia_ArvBin(Atendimentos *raiz)
 {
     if (raiz == NULL)
@@ -1589,12 +1698,34 @@ int estaVazia_ArvBin(Atendimentos *raiz)
     return 0;
 }
 
+/**
+ * Função: solicitarDiaDeAtendimento
+ * -----------------------------------
+ * Solicita ao usuário a data do atendimento e a armazena
+ * na estrutura Atendimento fornecida.
+ *
+ * @param atendimento: um ponteiro para a estrutura Atendimento onde
+ *                    a data será armazenada.
+ */
 void solicitarDiaDeAtendimento(Atendimento *atendimento)
 {
     printf("\nDigite a data do atendimento (dia mes ano): ");
     scanf("%d %d %d", &atendimento->dia, &atendimento->mes, &atendimento->ano);
 }
 
+/**
+ * Função: consulta_ArvBin
+ * ------------------------
+ * Realiza a busca de um atendimento na árvore binária com base na
+ * data fornecida. Se encontrado, atualiza a estrutura Atendimento
+ * com os dados do atendimento encontrado.
+ *
+ * @param raiz: um ponteiro para a raiz da árvore binária de atendimentos.
+ * @param atendimento: um ponteiro para a estrutura Atendimento que contém
+ *                    a data a ser buscada e será atualizada com os dados
+ *                    do atendimento encontrado.
+ * @return: 1 se o atendimento for encontrado, 0 caso contrário.
+ */
 int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento)
 {
     if (raiz == NULL)
@@ -1620,9 +1751,17 @@ int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento)
 
     return 0; // Atendimento não encontrado
 }
-// Fim implementação da Árvore Binária.
 
-// Incício implementação da Heap Binária.
+/**
+ * Função: cria_FilaPrio
+ * -----------------------
+ * Cria e inicializa uma nova fila de consultas com capacidade para um
+ * número máximo de atendimentos. Aloca memória para a estrutura Consultas,
+ * inicializa os campos de cada consulta com valores padrão e horários corretos,
+ * e insere cada consulta na fila de prioridade.
+ *
+ * @return: um ponteiro para a nova estrutura Consultas, ou NULL se a alocação falhar.
+ */
 Consultas *cria_FilaPrio()
 {
     Consultas *fp;
@@ -1656,6 +1795,15 @@ Consultas *cria_FilaPrio()
     return fp;
 }
 
+/**
+ * Função: libera_FilaPrio
+ * -----------------------
+ * Libera a memória alocada para a fila de consultas, incluindo o array de
+ * consultas e o array de prioridades, se existirem. A função verifica se a
+ * fila é nula antes de tentar liberar a memória.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas a ser liberada.
+ */
 void libera_FilaPrio(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1679,6 +1827,20 @@ void libera_FilaPrio(Consultas *fila_Consultas)
     free(fila_Consultas);
 }
 
+/**
+ * Função: insere_FilaPrio
+ * -----------------------
+ * Insere um novo horário na fila de consultas, verificando se a fila não
+ * está cheia. Caso a fila esteja cheia, uma mensagem é exibida e a função
+ * retorna um erro. Se a inserção for bem-sucedida, o horário é adicionado
+ * ao array de prioridades, e a função valida a fila após a inserção.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas onde o horário
+ *                        será inserido.
+ * @param horario: o horário a ser inserido na fila de consultas.
+ * @return: 1 se a inserção for bem-sucedida, 0 se a fila estiver cheia ou
+ *          se a fila for nula.
+ */
 int insere_FilaPrio(Consultas *fila_Consultas, int horario)
 {
     if (fila_Consultas == NULL)
@@ -1698,6 +1860,18 @@ int insere_FilaPrio(Consultas *fila_Consultas, int horario)
     return 1; // Sucesso.
 }
 
+/**
+ * Função: validarFila
+ * -----------------------
+ * Realiza a validação da fila de prioridades, garantindo que a propriedade
+ * da heap seja mantida. A função compara a prioridade do último elemento
+ * inserido com seus pais e, se necessário, realiza trocas para manter
+ * a ordem correta, subindo na árvore até a raiz.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila.
+ * @param ultimo_Elemento: índice do último elemento inserido na fila.
+ */
 void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
 {
     int filho, pai;
@@ -1725,6 +1899,20 @@ void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
     }
 }
 
+/**
+ * Função: marcarConsulta
+ * -----------------------
+ * Marca uma consulta na fila de atendimentos. A função exibe os horários
+ * preenchidos e solicita ao usuário que escolha um horário para agendar.
+ * Após verificar se o horário está disponível, coleta os dados da consulta
+ * e atualiza o status para "Agendado". Os dados coletados incluem informações
+ * do profissional, atendente, tutor, animal, porte, valor, e detalhes da consulta.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ *
+ * @return 1 se a consulta foi agendada com sucesso, 0 se houve erro.
+ */
 int marcarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1803,6 +1991,19 @@ int marcarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
+/**
+ * Função: consulta_FilaPrio
+ * ---------------------------
+ * Exibe as informações da consulta mais prioritária na fila de atendimentos.
+ * A função verifica se a fila de consultas é válida e se há consultas
+ * registradas. Em seguida, procura a consulta que corresponde à prioridade
+ * mais alta (menor horário) e imprime os detalhes da consulta, incluindo
+ * o horário, nome do tutor, nome do animal, status da consulta, se foi
+ * concluída, e a prioridade.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ */
 void consulta_FilaPrio(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
@@ -1825,6 +2026,18 @@ void consulta_FilaPrio(Consultas *fila_Consultas)
     }
 }
 
+/**
+ * Função: visualizar_FilaPrio
+ * -----------------------------
+ * Exibe a lista de próximas consultas na fila de atendimentos, mostrando
+ * os detalhes de cada consulta, incluindo horário, nome do tutor, nome do
+ * animal, status e se a consulta foi concluída. A função verifica se a
+ * fila de consultas é válida e imprime uma mensagem de erro se estiver vazia
+ * ou não existir.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ */
 void visualizar_FilaPrio(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1847,6 +2060,21 @@ void visualizar_FilaPrio(Consultas *fila_Consultas)
     }
 }
 
+/**
+ * Função: atualizarConsulta
+ * ---------------------------
+ * Permite ao usuário atualizar os dados de uma consulta já agendada na fila de atendimentos.
+ * Exibe os horários agendados e solicita que o usuário escolha um horário para atualizar.
+ * Coleta os novos dados da consulta, como nome do profissional, atendente, tutor, entre outros,
+ * e atualiza a consulta na fila. Verifica se o horário selecionado é válido e se a consulta
+ * está agendada antes de realizar a atualização.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ *
+ * @return: retorna 1 se a atualização foi bem-sucedida e 0 se a fila de
+ *          consultas não existe ou se o horário é inválido.
+ */
 int atualizarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1926,6 +2154,21 @@ int atualizarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
+/**
+ * Função: remove_FilaPrio
+ * -------------------------
+ * Remove a consulta com a maior prioridade da fila de atendimentos
+ * e realiza o check-in. A consulta é marcada como concluída, a quantidade
+ * de consultas na fila é decrementada, e o elemento mais prioritário
+ * é rebaixado na estrutura de dados.
+ * 
+ * @param fp: ponteiro para a estrutura Consultas que contém os dados
+ *            da fila de consultas.
+ * 
+ * @return: retorna 1 se o check-in foi realizado com sucesso, 
+ *          e 0 se a fila está vazia, não existe, ou se ocorreu um erro 
+ *          durante o check-in.
+ */
 int remove_FilaPrio(Consultas *fp)
 {
     if (fp == NULL)
@@ -1949,6 +2192,20 @@ int remove_FilaPrio(Consultas *fp)
     return 0;
 }
 
+/**
+ * Função: rebaixarElemento
+ * -------------------------
+ * Rebaixa um elemento na fila de prioridades, garantindo que a propriedade
+ * da heap mínima seja mantida. A função troca o elemento pai com o
+ * filho de menor prioridade até que a posição do pai esteja correta
+ * ou até que o elemento não tenha mais filhos.
+ * 
+ * @param fp: ponteiro para a estrutura Consultas que contém os dados
+ *            da fila de consultas.
+ * @param pai: índice do elemento pai que deve ser rebaixado na fila.
+ * 
+ * @return: Nenhum. A função modifica a estrutura da fila diretamente.
+ */
 void rebaixarElemento(Consultas *fp, int pai)
 {
     int temp;
@@ -1970,6 +2227,21 @@ void rebaixarElemento(Consultas *fp, int pai)
     }
 }
 
+/**
+ * Função: realizarCheckin
+ * -------------------------
+ * Realiza o check-in da consulta com o horário de maior prioridade,
+ * marcando-a como concluída e atualizando seu status para "Concluída".
+ * A função percorre a lista de consultas para encontrar a consulta
+ * correspondente ao horário de prioridade mais alta e modifica seu
+ * estado.
+ * 
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ * 
+ * @return: 1 se o check-in for realizado com sucesso; 0 se a fila
+ *          de consultas estiver vazia ou nula.
+ */
 int realizarCheckin(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
@@ -1988,6 +2260,22 @@ int realizarCheckin(Consultas *fila_Consultas)
     return 1;
 }
 
+/**
+ * Função: desmarcarConsulta
+ * ---------------------------
+ * Desmarca uma consulta agendada, definindo todos os campos
+ * da consulta correspondente ao horário escolhido como "Vazio"
+ * e atualizando seu status para "Vago". A função exibe
+ * os horários agendados e solicita ao usuário que informe o
+ * horário que deseja desmarcar.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ *
+ * @return: 1 se a consulta for desmarcada com sucesso; 0 se a fila
+ *          de consultas estiver vazia ou nula, ou se o horário
+ *          informado for inválido.
+ */
 int desmarcarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -2037,6 +2325,18 @@ int desmarcarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
+/**
+ * Função: estaCheia_FilaPrio
+ * ---------------------------
+ * Verifica se a fila de consultas está cheia.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ *
+ * @return: -1 se a fila de consultas for nula (erro);
+ *          1 se a fila estiver cheia;
+ *          0 se a fila não estiver cheia.
+ */
 int estaCheia_FilaPrio(Consultas *fila_Consultas)
 {
     // -1 erro, 1 está cheia, 0 não está cheia.
@@ -2048,6 +2348,18 @@ int estaCheia_FilaPrio(Consultas *fila_Consultas)
     return (fila_Consultas->qtd == MAX_ATENDIMENTOS);
 }
 
+/**
+ * Função: estaVazia_FilaPrio
+ * ---------------------------
+ * Verifica se a fila de consultas está vazia.
+ *
+ * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
+ *                        os dados da fila de consultas.
+ *
+ * @return: -1 se a fila de consultas for nula (erro);
+ *          1 se a fila estiver vazia;
+ *          0 se a fila contiver elementos.
+ */
 int estaVazia_FilaPrio(Consultas *fila_Consultas)
 {
     // -1 erro, 1 está vazia, 0 possui elementos;
@@ -2057,4 +2369,3 @@ int estaVazia_FilaPrio(Consultas *fila_Consultas)
     }
     return (fila_Consultas->qtd == 0);
 }
-// Fim implementação da Heap Binária.
