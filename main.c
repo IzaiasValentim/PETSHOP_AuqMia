@@ -101,31 +101,6 @@ int atualizarCargoDeFuncionario(Hash *ha, char *username);
 Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados);
 Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, int veterinario);
 
-// Função apenas para fins de desenvolvimento, remover antes da entrega.
-void exibeUsuarios(Hash *ha)
-{
-    int i;
-    for (i = 0; i < ha->TAM_TAB; i++)
-    {
-        printf("Posição %d:\n", i);
-        Usuario *atual = ha->usuarios[i]; // Pega o primeiro usuário na posição i
-
-        if (atual == NULL)
-        {
-            printf("  [Vazio]\n");
-        }
-        else
-        {
-            // Percorre a lista encadeada de usuários na posição i
-            while (atual != NULL)
-            {
-                printf("  Usuário: %s, Email: %s\n", atual->username, atual->email);
-                atual = atual->prox; // Avança para o próximo usuário na lista encadeada
-            }
-        }
-    }
-}
-
 // Funções da nossa árvore binária.
 Atendimentos *cria_ArvBin();
 void libera_ArvBin(Atendimentos *raiz);
