@@ -101,44 +101,38 @@ int atualizarCargoDeFuncionario(Hash *ha, char *username);
 Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados);
 Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, int veterinario);
 
-// Funções da nossa árvore binária.
+// Funções da nossa Árvore Binária e Atendimentos.
 Atendimentos *cria_ArvBin();
-void libera_ArvBin(Atendimentos *raiz);
+
+// Funções auxiliares para inserção/consulta de um atendimento
+int comparaDatas(Atendimento a1, Atendimento a2);
+void setarDataNoAtendimento(Atendimento *atendimento);
+
 int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento);
-int remove_ArvBin(Atendimentos *raiz, int valor); // faltando
-int estaVazia_ArvBin(Atendimentos *raiz);
-int totalNO_ArvBin(Atendimentos *raiz);
-int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
-void preordem_ArvBin(Atendimentos *raiz);
-void solicitarDiaDeAtendimento(Atendimento *atendimento);
-// Funções do Atendimento:
 int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario);
+void preordem_ArvBin(Atendimentos *raiz);
+int totalNO_ArvBin(Atendimentos *raiz);
+void libera_ArvBin(Atendimentos *raiz);
+int estaVazia_ArvBin(Atendimentos *raiz);
+int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
+void solicitarDiaDeAtendimento(Atendimento *atendimento);
+int remove_ArvBin(Atendimentos *raiz, int valor);
 
 // Funções Heap|Consultas
 Consultas *cria_FilaPrio(); // Cria a fila de prioridade com o array de consultas em estado de consultas vagas.
 void libera_FilaPrio(Consultas *fila_Consultas);
-
 int insere_FilaPrio(Consultas *fila_Consultas, int horario);      // Adiciona um horário de atendimento à fila.
 void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); // Função complementar de inserção.
-
+int marcarConsulta(Consultas *fila_Consultas);
 void consulta_FilaPrio(Consultas *fila_Consultas);   // Retorna a próxima consulta.
 void visualizar_FilaPrio(Consultas *fila_Consultas); // Retorna a lista total.
-
+int atualizarConsulta(Consultas *fila_Consultas);
 int remove_FilaPrio(Consultas *fila_Consultas);            // Finaliza a próxima consulta e realiza o checkin.
 void rebaixarElemento(Consultas *fila_Consultas, int pai); // Função complementar de remoção.
 int realizarCheckin(Consultas *fila_Consultas);            // Marca a próxima consulta da lista como Concluída e a Remove a prioridade. Mas a consulta ainda permance na lista.
-
-int tamanho_FilaPrio(Consultas *fila_Consultas);   // Aux.
+int desmarcarConsulta(Consultas *fila_Consultas);
 int estaCheia_FilaPrio(Consultas *fila_Consultas); // Aux.
 int estaVazia_FilaPrio(Consultas *fila_Consultas); // Aux.
-
-int marcarConsulta(Consultas *fila_Consultas);
-int atualizarConsulta(Consultas *fila_Consultas);
-int desmarcarConsulta(Consultas *fila_Consultas);
-
-// Funções auxiliares
-int comparaDatas(Atendimento a1, Atendimento a2);
-void setarDataNoAtendimento(Atendimento *atendimento);
 
 int main()
 {
@@ -700,7 +694,6 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
     } while (opcao != 3);
 }
 
-// Função de login
 int login(Hash *usuarios, Usuario *usuarioLogado)
 {
     char username[50], senha[20];
@@ -727,7 +720,17 @@ int login(Hash *usuarios, Usuario *usuarioLogado)
     }
 }
 
-// Implementação de hash para usuários
+/**
+ * Função: criaHash
+ * -----------------------
+ * Cria e inicializa uma nova tabela hash para armazenar usuários.
+ * Aloca memória para a estrutura Hash e para o array de ponteiros 
+ * de usuários. Inicializa a quantidade de usuários para zero e 
+ * define todos os ponteiros do array como NULL.
+ *
+ * @param TABLE_SIZE: o tamanho da tabela hash a ser criada.
+ * @return: um ponteiro para a nova estrutura Hash, ou NULL se a alocação falhar.
+ */
 Hash *criaHash(int TABLE_SIZE)
 {
     Hash *ha = (Hash *)malloc(sizeof(Hash));
@@ -748,11 +751,32 @@ Hash *criaHash(int TABLE_SIZE)
     return ha;
 }
 
+/**
+ * Função: chaveDivisao
+ * --------------------
+ * Realiza o cálculo do índice para inserção em uma tabela hash usando o método da divisão.
+ * A função aplica um "and" bitwise com 0x7FFFFFFF para garantir um valor não negativo
+ * e, em seguida, calcula o módulo da chave com o tamanho da tabela.
+ *
+ * @param chave: valor inteiro da chave a ser inserida.
+ * @param TABLE_SIZE: tamanho da tabela hash.
+ * @return: índice calculado para inserção na tabela hash.
+ */
 int chaveDivisao(int chave, int TABLE_SIZE)
 {
     return (chave & 0x7FFFFFFF) % TABLE_SIZE;
 }
 
+/**
+ * Função: chaveTabelaPorUsername
+ * ------------------------------
+ * Calcula o valor hash baseado em uma string (como o nome de usuário).
+ * Usa uma função de espalhamento simples multiplicando o valor acumulado por 31
+ * e somando o valor ASCII de cada caractere da string.
+ *
+ * @param str: ponteiro para uma string contendo o nome de usuário.
+ * @return: valor inteiro representando o hash calculado da string.
+ */
 int chaveTabelaPorUsername(char *str)
 {
     int i, valor = 7;
@@ -762,6 +786,18 @@ int chaveTabelaPorUsername(char *str)
     return valor;
 }
 
+/**
+ * Função: inserirUsuario
+ * ----------------------
+ * Insere um novo usuário em uma tabela hash, verificando se o usuário já existe e
+ * gerenciando a alocação de memória e criação da árvore de atendimentos, se necessário.
+ * A função utiliza o método da divisão para calcular a posição na tabela e garante
+ * que o usuário não seja duplicado.
+ *
+ * @param ha: ponteiro para a tabela hash onde o usuário será inserido.
+ * @param usuario: estrutura do tipo Usuario a ser inserida.
+ * @return: 1 se o usuário for inserido com sucesso, 0 em caso de falha ou se o usuário já existir.
+ */
 int inserirUsuario(Hash *ha, Usuario usuario)
 {
     if (ha == NULL || ha->quantidade == ha->TAM_TAB)
@@ -795,27 +831,18 @@ int inserirUsuario(Hash *ha, Usuario usuario)
     return 1;
 }
 
-int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username)
-{
-
-    if (ha == NULL)
-        return 0; // Tabela hash inválida
-
-    Usuario *atual = ha->usuarios[posicao]; // Aponta para o primeiro usuário na posição
-    while (atual != NULL)
-    {
-        if (strcmp(atual->username, username) == 0)
-        {
-            printf("Já existe um usuario com o username: %s\n", username);
-            printf("Tente novamente com outro username.\n");
-            return 1; // Usuário encontrado
-        }
-        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
-    }
-
-    return 0; // Usuário não encontrado
-}
-
+/**
+ * Função: buscaUsuarioPorUsername
+ * -------------------------------
+ * Realiza a busca de um usuário na tabela hash a partir de seu nome de usuário.
+ * A função calcula o índice da tabela hash com base no nome e percorre a lista
+ * de usuários nessa posição até encontrar uma correspondência.
+ *
+ * @param ha: ponteiro para a tabela hash onde os usuários estão armazenados.
+ * @param nome: ponteiro para uma string contendo o nome de usuário a ser buscado.
+ * @param usuario: ponteiro para a estrutura Usuario onde os dados do usuário encontrado serão armazenados.
+ * @return: 1 se o usuário for encontrado, 0 em caso de falha ou se o usuário não existir.
+ */
 int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario)
 {
     if (ha == NULL)
@@ -838,6 +865,15 @@ int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario)
     return 1;
 }
 
+/**
+ * Função: liberarHash
+ * -------------------
+ * Libera a memória alocada para a tabela hash e todos os usuários nela armazenados.
+ * A função percorre cada posição da tabela, liberando todos os usuários associados
+ * a cada índice, e, ao final, libera a própria estrutura da tabela hash.
+ *
+ * @param ha: ponteiro para a tabela hash a ser liberada.
+ */
 void liberarHash(Hash *ha)
 {
     if (ha != NULL)
@@ -861,6 +897,17 @@ void liberarHash(Hash *ha)
     }
 }
 
+/**
+ * Função: cadastrarUsuario
+ * ------------------------
+ * Realiza o cadastro de um novo usuário no sistema. A função solicita dados como email,
+ * nome de usuário, senha e cargo, validando se o email ou username já estão cadastrados
+ * e determinando o cargo do usuário com base em uma escolha numérica.
+ * Após validar e preencher os dados, tenta inserir o usuário na tabela hash.
+ *
+ * @param ha: ponteiro para a tabela hash onde os usuários são armazenados.
+ * @return: 1 se o usuário for cadastrado com sucesso, 0 em caso de erro ou validação falha.
+ */
 int cadastrarUsuario(Hash *ha)
 {
     Usuario novoUsuario;
@@ -923,6 +970,18 @@ int cadastrarUsuario(Hash *ha)
     }
 }
 
+/**
+ * Função: validarEmail
+ * ---------------------
+ * Valida um email fornecido, verificando se ele contém o caractere '@',
+ * se seu comprimento é inferior a 80 caracteres e se já existe um cadastro
+ * com esse email na tabela hash. A função percorre todas as listas de usuários
+ * na tabela para verificar se o email já está em uso.
+ *
+ * @param ha: ponteiro para a tabela hash onde os usuários estão armazenados.
+ * @param email: ponteiro para a string contendo o email a ser validado.
+ * @return: 1 se o email for inválido ou já estiver cadastrado, 0 se for válido.
+ */
 int validarEmail(Hash *ha, char *email)
 {
 
@@ -958,6 +1017,48 @@ int validarEmail(Hash *ha, char *email)
     return 0; // Email não encontrado
 }
 
+/**
+ * Função: verificaSeUsuarioExiste
+ * ---------------------------------
+ * Verifica se um usuário com um determinado nome de usuário já existe na tabela hash.
+ * A função percorre a lista de usuários na posição especificada e compara os nomes
+ * de usuário. Se encontrar uma correspondência, informa que o usuário já existe.
+ *
+ * @param ha: ponteiro para a tabela hash onde os usuários estão armazenados.
+ * @param posicao: índice na tabela hash onde a busca será realizada.
+ * @param username: ponteiro para a string contendo o nome de usuário a ser verificado.
+ * @return: 1 se o usuário já existir, 0 se não existir.
+ */
+int verificaSeUsuarioExiste(Hash *ha, int posicao, char *username)
+{
+
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    Usuario *atual = ha->usuarios[posicao]; // Aponta para o primeiro usuário na posição
+    while (atual != NULL)
+    {
+        if (strcmp(atual->username, username) == 0)
+        {
+            printf("Já existe um usuario com o username: %s\n", username);
+            printf("Tente novamente com outro username.\n");
+            return 1; // Usuário encontrado
+        }
+        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
+    }
+
+    return 0; // Usuário não encontrado
+}
+
+/**
+ * Função: visualizarTodosUsuarios
+ * --------------------------------
+ * Exibe a lista de todos os usuários cadastrados na tabela hash.
+ * A função percorre cada posição da tabela hash e, para cada usuário
+ * encontrado, imprime seu nome de usuário e cargo correspondente.
+ *
+ * @param usuarios: ponteiro para a tabela hash que contém os usuários a serem exibidos.
+ */
 void visualizarTodosUsuarios(Hash *usuarios)
 {
     int i;
@@ -983,6 +1084,138 @@ void visualizarTodosUsuarios(Hash *usuarios)
             atual = atual->prox;
         }
     }
+}
+
+/**
+ * Função: atualizarUsuario
+ * --------------------------
+ * Atualiza as informações de um usuário na tabela hash.
+ * A função permite que o usuário atualize seu email, username e senha.
+ * Se um campo não for desejado para atualização, o usuário deve inserir '0'.
+ * Se o novo email for inválido ou o novo username já existir, a função
+ * informa o usuário e não realiza a atualização.
+ *
+ * @param ha: ponteiro para a tabela hash que contém os usuários.
+ * @param usuarioAntigo: ponteiro para o usuário cujas informações serão atualizadas.
+ * @return: 1 se a atualização for bem-sucedida, 0 em caso de erro.
+ */
+int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
+{
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    Usuario usuarioAtualizado = *usuarioAntigo;
+
+    printf("=== Atualização de Usuário ===\n");
+    printf("Email, 0 se não quiser atualizar: ");
+    scanf("%s", usuarioAtualizado.email);
+
+    if (strcmp(usuarioAtualizado.email, "0") == 0)
+    {
+        strcpy(usuarioAtualizado.email, usuarioAntigo->email);
+    }
+    else
+    {
+        if (validarEmail(ha, usuarioAtualizado.email))
+        {
+            printf("Realize o atulização com um e-mail válido.\n");
+            return 0;
+        }
+    }
+
+    printf("Username, 0 se não quiser atualizar: ");
+    scanf("%s", usuarioAtualizado.username);
+    Usuario mock;
+    if (strcmp(usuarioAtualizado.username, "0") == 0)
+    {
+        strcpy(usuarioAtualizado.username, usuarioAntigo->username);
+    }
+    else
+    {
+        if (buscaUsuarioPorUsername(ha, usuarioAtualizado.username, &mock) && strcmp(usuarioAtualizado.username, "0") != 0)
+        {
+            printf("Username já existente na base de dados, realize o cadastro novamente!\n");
+            return 0;
+        }
+    }
+
+    printf("Senha: ");
+    scanf("%s", usuarioAtualizado.senha);
+    if (deletarUsuarioSimplificado(ha, *usuarioAntigo))
+    {
+        if (inserirUsuario(ha, usuarioAtualizado))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+/**
+ * Função: atualizarCargoDeFuncionario
+ * -------------------------------------
+ * Atualiza o cargo de um funcionário na tabela hash com base no seu nome de usuário.
+ * A função localiza o usuário na tabela e permite que o administrador defina um novo
+ * cargo. Os cargos disponíveis são: Vendedor, Veterinário, Tosador e Gerente.
+ *
+ * @param ha: ponteiro para a tabela hash que contém os usuários.
+ * @param username: ponteiro para a string com o nome de usuário do funcionário
+ *                  cujo cargo será atualizado.
+ * @return: 1 se o cargo foi atualizado com sucesso, 0 se o usuário não foi encontrado
+ *          ou se houve um erro.
+ */
+int atualizarCargoDeFuncionario(Hash *ha, char *username)
+{
+    if (ha == NULL)
+        return 0; // Tabela hash inválida
+
+    // Calcula a chave e a posição na tabela hash com base no username
+    int chave = chaveTabelaPorUsername(username);
+    int pos = chaveDivisao(chave, ha->TAM_TAB);
+
+    Usuario *atual = ha->usuarios[pos]; // Aponta para o primeiro usuário na posição
+
+    // Percorre a lista encadeada de usuários na posição calculada
+    while (atual != NULL)
+    {
+        // Verifica se o usuário foi encontrado pelo username
+        if (strcmp(atual->username, username) == 0)
+        {
+            printf("Informe o novo cargo de %s\n", atual->username);
+            printf("Cargo (1 - Vendedor, 2 - Veterinario, 3 - Tosador, 4 - Gerente): ");
+            int cargo;
+            scanf("%d", &cargo);
+
+            atual->vendedor = atual->veterinario = atual->tosador = atual->gerente = 0;
+
+            switch (cargo)
+            {
+            case 1:
+                atual->vendedor = 1;
+                break;
+            case 2:
+                atual->veterinario = 1;
+                break;
+            case 3:
+                atual->tosador = 1;
+                break;
+            case 4:
+                atual->gerente = 1;
+                break;
+            default:
+                printf("Cargo inválido!\n");
+                return 0;
+            }
+            return 1; // Cargo atualizado com sucesso
+        }
+        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
+    }
+
+    return 0; // Usuário não encontrado
 }
 
 int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
@@ -1045,6 +1278,20 @@ int deletarUsuario(Hash *ha, Usuario *gerenteLogado)
     }
 }
 
+/**
+ * Função: deletarUsuario
+ * ------------------------
+ * Remove um usuário da tabela hash com base no nome de usuário fornecido.
+ * A função verifica se o gerente logado está tentando excluir a si mesmo
+ * e se o usuário a ser removido existe na tabela. Se a remoção for confirmada,
+ * o usuário é removido da lista encadeada.
+ *
+ * @param ha: ponteiro para a tabela hash que contém os usuários.
+ * @param gerenteLogado: ponteiro para o usuário que está realizando a exclusão,
+ *                       para verificar se ele está tentando excluir a si mesmo.
+ * @return: 1 se o usuário foi removido com sucesso, 0 se o usuário não foi encontrado
+ *          ou se houve uma tentativa de exclusão do próprio gerente.
+ */
 int deletarUsuarioSimplificado(Hash *ha, Usuario usuario)
 {
     if (ha == NULL)
@@ -1087,112 +1334,20 @@ int deletarUsuarioSimplificado(Hash *ha, Usuario usuario)
     return 0; // Usuário não encontrado
 }
 
-int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
-{
-    if (ha == NULL)
-        return 0; // Tabela hash inválida
-
-    Usuario usuarioAtualizado = *usuarioAntigo;
-
-    printf("=== Atualização de Usuário ===\n");
-    printf("Email, 0 se não quiser atualizar: ");
-    scanf("%s", usuarioAtualizado.email);
-
-    if (strcmp(usuarioAtualizado.email, "0") == 0)
-    {
-        strcpy(usuarioAtualizado.email, usuarioAntigo->email);
-    }
-    else
-    {
-        if (validarEmail(ha, usuarioAtualizado.email))
-        {
-            printf("Realize o atulização com um e-mail válido.\n");
-            return 0;
-        }
-    }
-
-    printf("Username, 0 se não quiser atualizar: ");
-    scanf("%s", usuarioAtualizado.username);
-    Usuario mock;
-    if (strcmp(usuarioAtualizado.username, "0") == 0)
-    {
-        strcpy(usuarioAtualizado.username, usuarioAntigo->username);
-    }
-    else
-    {
-        if (buscaUsuarioPorUsername(ha, usuarioAtualizado.username, &mock) && strcmp(usuarioAtualizado.username, "0") != 0)
-        {
-            printf("Username já existente na base de dados, realize o cadastro novamente!\n");
-            return 0;
-        }
-    }
-
-    printf("Senha: ");
-    scanf("%s", usuarioAtualizado.senha);
-    if (deletarUsuarioSimplificado(ha, *usuarioAntigo))
-    {
-        if (inserirUsuario(ha, usuarioAtualizado))
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    return 0;
-}
-
-int atualizarCargoDeFuncionario(Hash *ha, char *username)
-{
-    if (ha == NULL)
-        return 0; // Tabela hash inválida
-
-    // Calcula a chave e a posição na tabela hash com base no username
-    int chave = chaveTabelaPorUsername(username);
-    int pos = chaveDivisao(chave, ha->TAM_TAB);
-
-    Usuario *atual = ha->usuarios[pos]; // Aponta para o primeiro usuário na posição
-
-    // Percorre a lista encadeada de usuários na posição calculada
-    while (atual != NULL)
-    {
-        // Verifica se o usuário foi encontrado pelo username
-        if (strcmp(atual->username, username) == 0)
-        {
-            printf("Informe o novo cargo de %s\n", atual->username);
-            printf("Cargo (1 - Vendedor, 2 - Veterinario, 3 - Tosador, 4 - Gerente): ");
-            int cargo;
-            scanf("%d", &cargo);
-
-            atual->vendedor = atual->veterinario = atual->tosador = atual->gerente = 0;
-
-            switch (cargo)
-            {
-            case 1:
-                atual->vendedor = 1;
-                break;
-            case 2:
-                atual->veterinario = 1;
-                break;
-            case 3:
-                atual->tosador = 1;
-                break;
-            case 4:
-                atual->gerente = 1;
-                break;
-            default:
-                printf("Cargo inválido!\n");
-                return 0;
-            }
-            return 1; // Cargo atualizado com sucesso
-        }
-        atual = atual->prox; // Avança para o próximo usuário na lista encadeada
-    }
-
-    return 0; // Usuário não encontrado
-}
-
+/**
+ * Função: usuariosVeterinariosTosadores
+ * ---------------------------------------
+ * Busca usuários que são veterinários ou tosadores na tabela hash
+ * e os armazena em um array dinâmico. A função aloca espaço para os resultados
+ * e aumenta a capacidade conforme necessário. O número total de resultados
+ * é retornado através do parâmetro `qtd_resultados`.
+ *
+ * @param tabela: ponteiro para a tabela hash que contém os usuários.
+ * @param qtd_resultados: ponteiro para um inteiro que armazenará a quantidade
+ *                        de usuários encontrados (veterinários ou tosadores).
+ * @return: ponteiro para um array de `Usuario` contendo os usuários encontrados.
+ *          Se nenhum usuário for encontrado, o array estará vazio.
+ */
 Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados)
 {
     int capacidade = 10;
@@ -1221,6 +1376,19 @@ Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados)
     return resultados;
 }
 
+/**
+ * Função: selecionarProfissional
+ * -------------------------------
+ * Exibe uma lista de profissionais (veterinários ou tosadores) com base 
+ * na quantidade fornecida e nas flags indicadoras de cada tipo de profissional.
+ * O usuário pode selecionar um profissional a partir da lista exibida.
+ *
+ * @param usuarios: array de `Usuario` contendo os profissionais disponíveis.
+ * @param quantidade: número total de usuários no array.
+ * @param tosador: flag (booleano) que indica se os tosadores devem ser incluídos na lista.
+ * @param veterinario: flag (booleano) que indica se os veterinários devem ser incluídos na lista.
+ * @return: um `Usuario` correspondente à escolha do usuário. Retorna um usuário vazio se a escolha for inválida.
+ */
 Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, int veterinario)
 {
     printf("Nome dos profissionais: \n");
@@ -1243,71 +1411,13 @@ Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, i
     return usuarios[escolha - 1];
 }
 
+// Incício implementação da Árvore Binária.
 Atendimentos *cria_ArvBin()
 {
     Atendimentos *raiz = (Atendimentos *)malloc(sizeof(Atendimentos));
     if (raiz != NULL)
         *raiz = NULL;
     return raiz;
-}
-
-void libera_NO(struct NO *no)
-{
-    if (no == NULL)
-        return;
-
-    libera_NO(no->esq);
-    libera_NO(no->dir);
-    free(no);
-    no = NULL;
-}
-
-void libera_ArvBin(Atendimentos *raiz)
-{
-    if (raiz == NULL)
-        return;
-
-    libera_NO(*raiz); // libera cada nó
-    free(raiz);       // libera a raiz
-}
-
-int estaVazia_ArvBin(Atendimentos *raiz)
-{
-    if (raiz == NULL)
-        return 1;
-    if (*raiz == NULL)
-        return 1;
-    return 0;
-}
-
-// Pode ser utilizado para ver quantos dias de atendimento o usuário possui.
-int totalNO_ArvBin(Atendimentos *raiz)
-{
-    if (raiz == NULL)
-        return 0;
-    if (*raiz == NULL)
-        return 0;
-    int total_esq = totalNO_ArvBin(&((*raiz)->esq));
-    int total_dir = totalNO_ArvBin(&((*raiz)->dir));
-    return (total_esq + total_dir + 1);
-}
-
-void preordem_ArvBin(Atendimentos *raiz)
-{
-    if (raiz == NULL)
-        return;
-    if (*raiz != NULL)
-    {
-        printf("%s - %d/%d/%d\n", (*raiz)->atendimento.usernameProfisional, (*raiz)->atendimento.dia, (*raiz)->atendimento.mes, (*raiz)->atendimento.ano);
-        preordem_ArvBin(&((*raiz)->esq));
-        preordem_ArvBin(&((*raiz)->dir));
-    }
-}
-
-void solicitarDiaDeAtendimento(Atendimento *atendimento)
-{
-    printf("\nDigite a data do atendimento (dia mes ano): ");
-    scanf("%d %d %d", &atendimento->dia, &atendimento->mes, &atendimento->ano);
 }
 
 int comparaDatas(Atendimento a1, Atendimento a2)
@@ -1335,6 +1445,17 @@ int comparaDatas(Atendimento a1, Atendimento a2)
                 return 0; // Datas iguais
         }
     }
+}
+
+void setarDataNoAtendimento(Atendimento *atendimento)
+{
+
+    time_t t = time(NULL);              // Obtém o tempo atual
+    struct tm *tm_info = localtime(&t); // Converte para a estrutura tm
+
+    atendimento->dia = tm_info->tm_mday;
+    atendimento->mes = tm_info->tm_mon + 1;
+    atendimento->ano = tm_info->tm_year + 1900;
 }
 
 int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
@@ -1383,32 +1504,6 @@ int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
     return 1;
 }
 
-int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento)
-{
-    if (raiz == NULL)
-        return 0; // Árvore inválida ou vazia
-
-    struct NO *atual = *raiz;
-
-    while (atual != NULL)
-    {
-        // 0 as datas são iguais.
-        int comparacao = comparaDatas(*atendimento, atual->atendimento);
-
-        if (comparacao == 0)
-        {
-            *atendimento = atual->atendimento; // Atualiza com o dado encontrado
-            return 1;                          // Atendimento encontrado
-        }
-        if (comparacao > 0)
-            atual = atual->dir; // Vai para o lado direito se a data é maior
-        else
-            atual = atual->esq; // Vai para o lado esquerdo se a data é menor
-    }
-
-    return 0; // Atendimento não encontrado
-}
-
 int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
 {
     if (raiz == NULL)
@@ -1442,6 +1537,92 @@ int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario)
     }
 }
 
+int totalNO_ArvBin(Atendimentos *raiz)
+{
+    if (raiz == NULL)
+        return 0;
+    if (*raiz == NULL)
+        return 0;
+    int total_esq = totalNO_ArvBin(&((*raiz)->esq));
+    int total_dir = totalNO_ArvBin(&((*raiz)->dir));
+    return (total_esq + total_dir + 1);
+}
+
+void preordem_ArvBin(Atendimentos *raiz)
+{
+    if (raiz == NULL)
+        return;
+    if (*raiz != NULL)
+    {
+        printf("%s - %d/%d/%d\n", (*raiz)->atendimento.usernameProfisional, (*raiz)->atendimento.dia, (*raiz)->atendimento.mes, (*raiz)->atendimento.ano);
+        preordem_ArvBin(&((*raiz)->esq));
+        preordem_ArvBin(&((*raiz)->dir));
+    }
+}
+
+void libera_NO(struct NO *no)
+{
+    if (no == NULL)
+        return;
+
+    libera_NO(no->esq);
+    libera_NO(no->dir);
+    free(no);
+    no = NULL;
+}
+
+void libera_ArvBin(Atendimentos *raiz)
+{
+    if (raiz == NULL)
+        return;
+
+    libera_NO(*raiz); // libera cada nó
+    free(raiz);       // libera a raiz
+}
+
+int estaVazia_ArvBin(Atendimentos *raiz)
+{
+    if (raiz == NULL)
+        return 1;
+    if (*raiz == NULL)
+        return 1;
+    return 0;
+}
+
+void solicitarDiaDeAtendimento(Atendimento *atendimento)
+{
+    printf("\nDigite a data do atendimento (dia mes ano): ");
+    scanf("%d %d %d", &atendimento->dia, &atendimento->mes, &atendimento->ano);
+}
+
+int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento)
+{
+    if (raiz == NULL)
+        return 0; // Árvore inválida ou vazia
+
+    struct NO *atual = *raiz;
+
+    while (atual != NULL)
+    {
+        // 0 as datas são iguais.
+        int comparacao = comparaDatas(*atendimento, atual->atendimento);
+
+        if (comparacao == 0)
+        {
+            *atendimento = atual->atendimento; // Atualiza com o dado encontrado
+            return 1;                          // Atendimento encontrado
+        }
+        if (comparacao > 0)
+            atual = atual->dir; // Vai para o lado direito se a data é maior
+        else
+            atual = atual->esq; // Vai para o lado esquerdo se a data é menor
+    }
+
+    return 0; // Atendimento não encontrado
+}
+// Fim implementação da Árvore Binária.
+
+// Incício implementação da Heap Binária.
 Consultas *cria_FilaPrio()
 {
     Consultas *fp;
@@ -1498,25 +1679,23 @@ void libera_FilaPrio(Consultas *fila_Consultas)
     free(fila_Consultas);
 }
 
-int estaCheia_FilaPrio(Consultas *fila_Consultas)
+int insere_FilaPrio(Consultas *fila_Consultas, int horario)
 {
-    // -1 erro, 1 está cheia, 0 não está cheia.
     if (fila_Consultas == NULL)
+        return 0;
+    if (fila_Consultas->qtd == MAX_ATENDIMENTOS)
     {
-        return -1;
+        printf("\nEste dia de atendimentos esta lotado :c\n");
+        return 0;
     }
+    fila_Consultas->qtd++;
+    fila_Consultas->prioridade[fila_Consultas->qtd - 1] = horario;
 
-    return (fila_Consultas->qtd == MAX_ATENDIMENTOS);
-}
-
-int estaVazia_FilaPrio(Consultas *fila_Consultas)
-{
-    // -1 erro, 1 está vazia, 0 possui elementos;
-    if (fila_Consultas == NULL)
-    {
-        return -1;
-    }
-    return (fila_Consultas->qtd == 0);
+    // strcpy(fp->dados[fp->qtd].nome, nome);
+    // fp->dados[fp->qtd].prio = prio;
+    validarFila(fila_Consultas, fila_Consultas->qtd - 1);
+    // promoverElemento (fp, fp->qtd);
+    return 1; // Sucesso.
 }
 
 void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
@@ -1543,131 +1722,6 @@ void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
         // Atualiza os índices para a próxima iteração
         filho = pai;
         pai = (filho - 2) / 2;
-    }
-}
-
-int insere_FilaPrio(Consultas *fila_Consultas, int horario)
-{
-    if (fila_Consultas == NULL)
-        return 0;
-    if (fila_Consultas->qtd == MAX_ATENDIMENTOS)
-    {
-        printf("\nEste dia de atendimentos esta lotado :c\n");
-        return 0;
-    }
-    fila_Consultas->qtd++;
-    fila_Consultas->prioridade[fila_Consultas->qtd - 1] = horario;
-
-    // strcpy(fp->dados[fp->qtd].nome, nome);
-    // fp->dados[fp->qtd].prio = prio;
-    validarFila(fila_Consultas, fila_Consultas->qtd - 1);
-    // promoverElemento (fp, fp->qtd);
-    return 1; // Sucesso.
-}
-
-void rebaixarElemento(Consultas *fp, int pai)
-{
-    int temp;
-    int filho = 2 * pai + 1;
-    while (filho < fp->qtd)
-    {
-        if (filho < fp->qtd - 1)
-            if (fp->prioridade[filho] > fp->prioridade[filho + 1])
-                filho++;
-        if (fp->prioridade[pai] <= fp->prioridade[filho])
-            break;
-
-        temp = fp->prioridade[pai];
-        fp->prioridade[pai] = fp->prioridade[filho];
-        fp->prioridade[filho] = temp;
-
-        pai = filho;
-        filho = 2 * pai + 1;
-    }
-}
-
-int remove_FilaPrio(Consultas *fp)
-{
-    if (fp == NULL)
-        return 0;
-    if (fp->qtd == 0)
-    {
-        printf("Todas as consultas do dia foram realizadas!");
-        return 0;
-    }
-
-    // Marca a consulta da prioridade atual da lista como concluido.
-    if (realizarCheckin(fp))
-    {
-        fp->qtd--;
-        fp->prioridade[0] = fp->prioridade[fp->qtd];
-        rebaixarElemento(fp, 0);
-        printf("Checkin realizado!\n");
-        return 1;
-    }
-    printf("Erro ao realizar checkin!\n");
-    return 0;
-}
-
-int realizarCheckin(Consultas *fila_Consultas)
-{
-    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
-        return 0;
-    int i;
-
-    for (i = 0; i < MAX_ATENDIMENTOS; i++)
-    {
-        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
-        {
-            fila_Consultas->consulta[i].concluida = 1;
-            strcpy(fila_Consultas->consulta[i].status, "Concluida");
-            return 1;
-        }
-    }
-    return 1;
-}
-
-void consulta_FilaPrio(Consultas *fila_Consultas)
-{
-    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
-        return;
-    int i;
-
-    for (i = 0; i < MAX_ATENDIMENTOS; i++)
-    {
-        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
-        {
-            printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d, Prio: %d\n",
-                   fila_Consultas->consulta[i].horario,
-                   fila_Consultas->consulta[i].horario,
-                   fila_Consultas->consulta[i].nomeTutor,
-                   fila_Consultas->consulta[i].nomeAnimal,
-                   fila_Consultas->consulta[i].status,
-                   fila_Consultas->consulta[i].concluida,
-                   fila_Consultas->prioridade[0]);
-        }
-    }
-}
-
-void visualizar_FilaPrio(Consultas *fila_Consultas)
-{
-    if (fila_Consultas == NULL)
-    {
-        printf("Fila de consultas esta vazia ou nao existe.\n");
-        return;
-    }
-
-    printf("Lista de proximas Consultas (por prioridade de horarios):\n");
-    int i;
-    for (i = 0; i < MAX_ATENDIMENTOS; i++)
-    {
-        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d\n",
-               i + 1,
-               fila_Consultas->consulta[i].horario,
-               fila_Consultas->consulta[i].nomeTutor,
-               fila_Consultas->consulta[i].nomeAnimal,
-               fila_Consultas->consulta[i].status,
-               fila_Consultas->consulta[i].concluida);
     }
 }
 
@@ -1749,6 +1803,50 @@ int marcarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
+void consulta_FilaPrio(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
+        return;
+    int i;
+
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
+        {
+            printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d, Prio: %d\n",
+                   fila_Consultas->consulta[i].horario,
+                   fila_Consultas->consulta[i].horario,
+                   fila_Consultas->consulta[i].nomeTutor,
+                   fila_Consultas->consulta[i].nomeAnimal,
+                   fila_Consultas->consulta[i].status,
+                   fila_Consultas->consulta[i].concluida,
+                   fila_Consultas->prioridade[0]);
+        }
+    }
+}
+
+void visualizar_FilaPrio(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL)
+    {
+        printf("Fila de consultas esta vazia ou nao existe.\n");
+        return;
+    }
+
+    printf("Lista de proximas Consultas (por prioridade de horarios):\n");
+    int i;
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d\n",
+               i + 1,
+               fila_Consultas->consulta[i].horario,
+               fila_Consultas->consulta[i].nomeTutor,
+               fila_Consultas->consulta[i].nomeAnimal,
+               fila_Consultas->consulta[i].status,
+               fila_Consultas->consulta[i].concluida);
+    }
+}
+
 int atualizarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1828,6 +1926,68 @@ int atualizarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
+int remove_FilaPrio(Consultas *fp)
+{
+    if (fp == NULL)
+        return 0;
+    if (fp->qtd == 0)
+    {
+        printf("Todas as consultas do dia foram realizadas!");
+        return 0;
+    }
+
+    // Marca a consulta da prioridade atual da lista como concluido.
+    if (realizarCheckin(fp))
+    {
+        fp->qtd--;
+        fp->prioridade[0] = fp->prioridade[fp->qtd];
+        rebaixarElemento(fp, 0);
+        printf("Checkin realizado!\n");
+        return 1;
+    }
+    printf("Erro ao realizar checkin!\n");
+    return 0;
+}
+
+void rebaixarElemento(Consultas *fp, int pai)
+{
+    int temp;
+    int filho = 2 * pai + 1;
+    while (filho < fp->qtd)
+    {
+        if (filho < fp->qtd - 1)
+            if (fp->prioridade[filho] > fp->prioridade[filho + 1])
+                filho++;
+        if (fp->prioridade[pai] <= fp->prioridade[filho])
+            break;
+
+        temp = fp->prioridade[pai];
+        fp->prioridade[pai] = fp->prioridade[filho];
+        fp->prioridade[filho] = temp;
+
+        pai = filho;
+        filho = 2 * pai + 1;
+    }
+}
+
+int realizarCheckin(Consultas *fila_Consultas)
+{
+    if (fila_Consultas == NULL || fila_Consultas->qtd == 0)
+        return 0;
+    int i;
+
+    for (i = 0; i < MAX_ATENDIMENTOS; i++)
+    {
+        if (fila_Consultas->prioridade[0] == fila_Consultas->consulta[i].horario)
+        {
+            fila_Consultas->consulta[i].concluida = 1;
+            strcpy(fila_Consultas->consulta[i].status, "Concluida");
+            return 1;
+        }
+    }
+    return 1;
+}
+
 int desmarcarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
@@ -1877,13 +2037,24 @@ int desmarcarConsulta(Consultas *fila_Consultas)
     return 1; // Sucesso
 }
 
-void setarDataNoAtendimento(Atendimento *atendimento)
+int estaCheia_FilaPrio(Consultas *fila_Consultas)
 {
+    // -1 erro, 1 está cheia, 0 não está cheia.
+    if (fila_Consultas == NULL)
+    {
+        return -1;
+    }
 
-    time_t t = time(NULL);              // Obtém o tempo atual
-    struct tm *tm_info = localtime(&t); // Converte para a estrutura tm
-
-    atendimento->dia = tm_info->tm_mday;
-    atendimento->mes = tm_info->tm_mon + 1;
-    atendimento->ano = tm_info->tm_year + 1900;
+    return (fila_Consultas->qtd == MAX_ATENDIMENTOS);
 }
+
+int estaVazia_FilaPrio(Consultas *fila_Consultas)
+{
+    // -1 erro, 1 está vazia, 0 possui elementos;
+    if (fila_Consultas == NULL)
+    {
+        return -1;
+    }
+    return (fila_Consultas->qtd == 0);
+}
+// Fim implementação da Heap Binária.
