@@ -131,6 +131,22 @@ int desmarcarConsulta(Consultas *fila_Consultas);
 int estaCheia_FilaPrio(Consultas *fila_Consultas); 
 int estaVazia_FilaPrio(Consultas *fila_Consultas); 
 
+void limparConsole(){
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void pausa(){
+    #ifdef _WIN32
+        system("pause");
+    #else
+        printf("Pressione uma tecla para continuar!");
+        getchar();
+    #endif
+}
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
@@ -201,6 +217,7 @@ int main()
         // Pergunta se o usuário deseja continuar ou sair do sistema
         printf("\nDeseja continuar no sistema? (1 - Sim / 0 - Nao): ");
         scanf("%d", &continuar);
+        limparConsole();
     }
 
     printf("Obrigado por usar o sistema Pet Shop. Até mais!\n");
@@ -420,6 +437,8 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
         default:
             printf("Opcao invalida!\n");
         }
+        pausa();
+        limparConsole();
     } while (opcao != 4);
 }
 
@@ -499,6 +518,8 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
             printf("Opcao invalida!\n");
         }
         free(atendimentoBusca);
+        pausa();
+        limparConsole();
     } while (opcao != 7);
 }
 
@@ -578,6 +599,8 @@ void menuTosador(Hash *usuarios, Usuario *logado)
             printf("Opcao invalida!\n");
         }
         free(atendimentoBusca);
+        pausa();
+        limparConsole();
     } while (opcao != 7);
 }
 
@@ -685,6 +708,8 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
         default:
             printf("Opcao invalida!\n");
         }
+        pausa();
+        limparConsole();
     } while (opcao != 3);
 }
 
@@ -798,13 +823,7 @@ int inserirUsuario(Hash *ha, Usuario usuario)
         return 0;
     if (usuario.tosador || usuario.veterinario)
     {
-        if (usuario.arvoreAtendimentos = cria_ArvBin())
-        {
-        }
-        else
-        {
-            printf("Erro ao relacionar atendimento a usuario");
-        }
+        usuario.arvoreAtendimentos = cria_ArvBin();
     }
     int chave = chaveTabelaPorUsername(usuario.username);
     int pos = chaveDivisao(chave, ha->TAM_TAB);
