@@ -83,10 +83,13 @@
     - int estaVazia_FilaPrio(Consultas *fila_Consultas); 
     ```
   - Como dito anteriormente, há uma relação de dependência entre a estrutura dos Atendimentos e Consultas. Por exemplo, para cadastrar ou alterar uma consulta é necessário primeiro possuir um dia de antendimento cadastrado. Por meio da consulta a árvore, o nó(Dia de atendimento) poderá ser atualizada com a fila de consulta com um cadastro ou atualização, utilizando alguma das funções logo acima.
-### 3. Execução, na pasta raiz do projeto:
+### 3. Execução:
+   - [x] Primeiro clone o repositório em seu computador, no terminal ou Git Bash, execute o comando:
+   - > git clone https://github.com/IzaiasValentim/PETSHOP_AuqMia.git
+  - [x] Execução, na pasta raiz do projeto: 
    - > Compilador utilizado: MinGW.org GCC-6.3.0-1
    - > Compilação do arquivo .c: gcc main.c -o main.exe
-   - > Execução: .\\'main.exe'
+   - > Execução: ./main.exe
 ### 4.  Considerações:
    - *Na pasta "Utils", ./Utils, foram adicionadas os modelos base de estruturas de dados as quais estão sendo ou foram implementadas. No arquivo há um comentário com a fonte dos códigos.*
      - [Tabela Hash](https://github.com/IzaiasValentim/PETSHOP_AuqMia/blob/dev/Utils/Estrutura_Base_Hash/ModeloHash.c)  [Árvore Binária de Busca](https://github.com/IzaiasValentim/PETSHOP_AuqMia/blob/dev/Utils/Estrutura_Base_ArvoreB/Estrutura_Base_ArvoreB.c)  [Heap Binária](https://github.com/IzaiasValentim/PETSHOP_AuqMia/blob/dev/Utils/Estrutura_Base_Heap/Estrutura_Base_Heap.c)
