@@ -40,8 +40,49 @@
         - int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo);
         - int atualizarCargoDeFuncionario(Hash *ha, char *username); 
         ```
-- #### Menu do Atendente e suas atribuições:
 - #### Menu do Veterinário, Banho/Tosa e suas atribuições:
+  - Essas duas sessões serão apresentadas juntas pois possuem as mesmas funções e diferem apenas pelo cargo no negócio.
+  - Nesses tipos de sessões, o usuário terá acesso ao Menu Veterinário ou Tosador a depender do tipo de usuário.
+  - Eles poderão: Cadastrar dia de atendimento, Realizar checkin(Da próxima consulta do dia presente, caso haja), Visualizar atendimentos, Visualizar consultas do dia, Consultar consultas por dia, Atualizar minhas informações e Sair.
+  - Os plantões de atendimentos são implementados por meio da estrutura de dados Árvore Binária de Busca e esses são os seus protótipos de funções:
+    ```
+    - Atendimentos *cria_ArvBin();
+    - int comparaDatas(Atendimento a1, Atendimento a2);
+    - void setarDataNoAtendimento(Atendimento *atendimento);
+    - int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento);
+    - int cadastrarAtendimento(Atendimentos *raiz, Usuario *usuario);
+    - void preordem_ArvBin(Atendimentos *raiz);
+    - int totalNO_ArvBin(Atendimentos *raiz);
+    - void libera_ArvBin(Atendimentos *raiz);
+    - int estaVazia_ArvBin(Atendimentos *raiz);
+    - int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
+    - void solicitarDiaDeAtendimento(Atendimento *atendimento);
+    - int remove_ArvBin(Atendimentos *raiz, int valor);
+    ```
+  - Apesar de não possuir funções claras de atualização(update), cabe salientar que um nó da árvore de atendimentos conta com as informações das consultas, logo a atualização de um atendimento ocorre em conjunto com a próxima estrutura apresentada. 
+- #### Menu do Atendente e suas atribuições:
+  - Se a sessão do usuário for do tipo Atendente, o usuário terá acesso ao menu de atendimento. Este menu possui as opções: Atendimento veterinário, Banho/Tosa, Atualizar minhas informações e Sair que encerra a sessão.
+  - Se a escolha for Atendimento veterinário, o atendente poderá: Horarios disponíveis(De acordo com o profissional e dia informado), Marcar atendimento, Desmarcar atendimento, Alterar atendimento.
+  - Se a escolha for Banho/Tosa, o atendente poderá: Consultar os Horarios disponíveis(De acordo com o profissional e dia informado), Marcar atendimento, Desmarcar atendimento, Alterar atendimento.
+  - "Por trás dos panos" as funcionalidades acerca do CRUD de um atendimento( Realizar uma consulta veterinária ou atendimento de banho ou tosa) são realizadas em conjunto com a estrutura de dados anterior, uma vez que a fila de consultas é contida em um nó da árvore de atendimentos.
+  - A fila de consultas é uma fila de prioridade implementada em Heap Binária e possui tais protótipos:
+     ```
+    - Consultas *cria_FilaPrio(); 
+    - void libera_FilaPrio(Consultas *fila_Consultas);
+    - int insere_FilaPrio(Consultas *fila_Consultas, int horario);      
+    - void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); 
+    - int marcarConsulta(Consultas *fila_Consultas);
+    - void consulta_FilaPrio(Consultas *fila_Consultas);  
+    - void visualizar_FilaPrio(Consultas *fila_Consultas); 
+    - int atualizarConsulta(Consultas *fila_Consultas);
+    - int remove_FilaPrio(Consultas *fila_Consultas);            
+    - void rebaixarElemento(Consultas *fila_Consultas, int pai); 
+    - int realizarCheckin(Consultas *fila_Consultas);            
+    - int desmarcarConsulta(Consultas *fila_Consultas);
+    - int estaCheia_FilaPrio(Consultas *fila_Consultas); 
+    - int estaVazia_FilaPrio(Consultas *fila_Consultas); 
+    ```
+  - Como dito anteriormente, há uma relação de dependência entre a estrutura dos Atendimentos e Consultas. Por exemplo, para cadastrar ou alterar uma consulta é necessário primeiro possuir um dia de antendimento cadastrado. Por meio da consulta a árvore, o nó(Dia de atendimento) poderá ser atualizada com a fila de consulta com um cadastro ou atualização, utilizando alguma das funções logo acima.
 ### 3. Execução, na pasta raiz do projeto:
    - > Compilador utilizado: MinGW.org GCC-6.3.0-1
    - > Compilação do arquivo .c: gcc main.c -o main.exe
