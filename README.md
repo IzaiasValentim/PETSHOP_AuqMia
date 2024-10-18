@@ -20,9 +20,12 @@
        - int inserirUsuario(Hash *ha, Usuario usuario);
        - int buscaUsuarioPorUsername(Hash *ha, char *nome, Usuario *usuario);
        - void liberarHash(Hash *ha);
-       ```  
+       ```
      - Um usuário cadastrado poderá realizar o login com suas credênciais: 'username' e senha. O seu 'username' é um identificador único que gera uma posição na tabela Hash.
-     - O cadastro do usuário é realizada pelo gerente, em seu menu específico que logo será exposto.
+     - O cadastro do usuário é realizada pelo gerente, em seu menu específico que logo será exposto. 
+> [!IMPORTANT]
+> Em `main.c`, na definição de cada função, há comentários informativos a respeito do seu funcionamento, parâmetros e retorno.
+
   - #### Menu do Gerente e suas atribuições:
       - Após o login, se o usuário possuir o identificador de gerente, ele terá acesso ao menu da gerência que tem como principal função a gestão dos funcionários.
       - Funções de gestão: *Cadastrar Usuário, Deletar Usuário, Visualizar Usuários, Atualizar minhas informações, Atualizar cargo de um funcionário*.
