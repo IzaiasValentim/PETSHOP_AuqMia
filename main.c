@@ -120,7 +120,7 @@ Consultas *cria_FilaPrio();
 void libera_FilaPrio(Consultas *fila_Consultas);
 int insere_FilaPrio(Consultas *fila_Consultas, int horario);      
 void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); 
-int marcarConsulta(Consultas *fila_Consultas);
+int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * usernameProfissional);
 void consulta_FilaPrio(Consultas *fila_Consultas);  
 void visualizar_FilaPrio(Consultas *fila_Consultas); 
 int atualizarConsulta(Consultas *fila_Consultas);
@@ -287,7 +287,8 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
                 solicitarDiaDeAtendimento(&atendimentoBusca);
                 if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
                 {
-                    marcarConsulta(atendimentoBusca.consultas);
+                    //strcpy(usuarioAtualizado.email, usuarioAntigo->email);
+                    marcarConsulta(atendimentoBusca.consultas, logado->username, vet.username);
                 }
                 else
                 {
@@ -370,7 +371,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
                 solicitarDiaDeAtendimento(&atendimentoBusca);
                 if (consulta_ArvBin(tosador.arvoreAtendimentos, &atendimentoBusca))
                 {
-                    marcarConsulta(atendimentoBusca.consultas);
+                    marcarConsulta(atendimentoBusca.consultas, logado->username, tosador.username);
                 }
                 else
                 {
@@ -1935,10 +1936,16 @@ void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
  *
  * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
  *                        os dados da fila de consultas.
+ * 
+ * @param usernameAtendente: ponteiro para uma cadeia de caracteres com o username
+ *                           do atendente
+ * 
+ * @param usernameProfissional: ponteiro para uma cadeia de caracteres com o username
+ *                           do profissional 
  *
  * @return 1 se a consulta foi agendada com sucesso, 0 se houve erro.
  */
-int marcarConsulta(Consultas *fila_Consultas)
+int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * usernameProfissional)
 {
     if (fila_Consultas == NULL)
     {
@@ -1972,11 +1979,9 @@ int marcarConsulta(Consultas *fila_Consultas)
     novaConsulta.horario = horarioEscolhido;
     novaConsulta.concluida = 0; // Inicialmente, a consulta não está concluída
 
-    printf("Informe o nome do profissional: ");
-    scanf(" %[^\n]s", novaConsulta.usernameProfisional);
+    printf("Nome do profissional: %s\n", usernameProfissional);
 
-    printf("Informe o nome do atendente: ");
-    scanf(" %[^\n]s", novaConsulta.usernameAtendente);
+    printf("Informe o nome do atendente: %s\n", usernameAtendente);
 
     printf("Informe o nome do tutor: ");
     scanf(" %[^\n]s", novaConsulta.nomeTutor);
@@ -1993,9 +1998,6 @@ int marcarConsulta(Consultas *fila_Consultas)
     printf("Informe o porte do animal (1 - Pequeno, 2 - Médio, 3 - Grande): ");
     scanf("%d", &novaConsulta.porteAnimal);
 
-    printf("Informe o valor da consulta: ");
-    scanf("%f", &novaConsulta.valor);
-
     printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
     scanf("%d", &novaConsulta.consultaVeterinaria);
 
@@ -2004,6 +2006,9 @@ int marcarConsulta(Consultas *fila_Consultas)
 
     printf("É uma tosa? (1 - Sim, 0 - Não): ");
     scanf("%d", &novaConsulta.tosa);
+
+    printf("Informe o valor da consulta: ");
+    scanf("%f", &novaConsulta.valor);
 
     printf("Informe os detalhes da consulta: ");
     scanf(" %[^\n]s", novaConsulta.detalhes);
@@ -2135,12 +2140,6 @@ int atualizarConsulta(Consultas *fila_Consultas)
     novaConsulta.horario = horarioEscolhido;
     novaConsulta.concluida = 0; // Inicialmente, a consulta não está concluída
 
-    printf("Informe o nome do profissional: ");
-    scanf(" %[^\n]s", novaConsulta.usernameProfisional);
-
-    printf("Informe o nome do atendente: ");
-    scanf(" %[^\n]s", novaConsulta.usernameAtendente);
-
     printf("Informe o nome do tutor: ");
     scanf(" %[^\n]s", novaConsulta.nomeTutor);
 
@@ -2156,9 +2155,6 @@ int atualizarConsulta(Consultas *fila_Consultas)
     printf("Informe o porte do animal (1 - Pequeno, 2 - Médio, 3 - Grande): ");
     scanf("%d", &novaConsulta.porteAnimal);
 
-    printf("Informe o valor da consulta: ");
-    scanf("%f", &novaConsulta.valor);
-
     printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
     scanf("%d", &novaConsulta.consultaVeterinaria);
 
@@ -2170,6 +2166,9 @@ int atualizarConsulta(Consultas *fila_Consultas)
 
     printf("Informe os detalhes da consulta: ");
     scanf(" %[^\n]s", novaConsulta.detalhes);
+
+    printf("Informe o valor da consulta: ");
+    scanf("%f", &novaConsulta.valor);
 
     // Atualiza o status da consulta e insere na fila
     strcpy(novaConsulta.status, "Agendado");
