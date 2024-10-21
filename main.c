@@ -152,13 +152,9 @@ int main()
     SetConsoleOutputCP(CP_UTF8);
     // Lista de usuários cadastrados (para exemplo)
     Usuario usuarios[] = {
-        {"vendedor@petshop.com", "Vendedor", "12345", 1, 0, 0, 0, NULL, NULL},
+        {"vendedor@petshop.com", "Atendente", "12345", 1, 0, 0, 0, NULL, NULL},
         {"veterinario@petshop.com", "Veterinario", "12345", 0, 1, 0, 0, NULL, NULL},
         {"tosador@petshop.com", "Tosador", "12345", 0, 0, 1, 0, NULL, NULL},
-        {"izaias@petshop.com", "Luis Izaias", "12345", 0, 0, 1, 0, NULL, NULL},
-        {"izaias2@petshop.com", "Izaias Luis", "12345", 0, 0, 1, 0, NULL, NULL},
-        {"Tulio@petshop.com", "Tulio", "12345", 0, 0, 1, 0, NULL, NULL},
-        {"tosador@petshop.com", "Pablo", "12345", 0, 0, 1, 0, NULL, NULL},
         {"gerente@petshop.com", "Gerente", "12345", 0, 0, 0, 1, NULL, NULL}};
 
     int totalUsuarios = 17;
@@ -168,10 +164,6 @@ int main()
     inserirUsuario(Usuarios, usuarios[1]);
     inserirUsuario(Usuarios, usuarios[2]);
     inserirUsuario(Usuarios, usuarios[3]);
-    inserirUsuario(Usuarios, usuarios[4]);
-    inserirUsuario(Usuarios, usuarios[5]);
-    inserirUsuario(Usuarios, usuarios[6]);
-    inserirUsuario(Usuarios, usuarios[7]);
 
     Usuario usuarioLogado;
     int continuar = 1; // Variável para controlar o loop do sistema
@@ -206,7 +198,7 @@ int main()
             }
             else
             {
-                printf("Usuario invalido, confira suas credenciais.\n");
+                printf("Usuário inválido, confira suas credênciais.\n");
             }
         }
         else
@@ -219,7 +211,7 @@ int main()
         scanf("%d", &continuar);
         limparConsole();
     }
-
+    liberarHash(Usuarios);    
     printf("Obrigado por usar o sistema Pet Shop. Até mais!\n");
     return 0;
 }
@@ -248,7 +240,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
         printf("2. Banho/Tosa\n");
         printf("3. Atualizar minhas informações \n");
         printf("4. Sair\n");
-        printf("Escolha uma opcao: ");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -264,7 +256,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             scanf("%d", &opcao);
             if (opcao == 1)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -281,7 +273,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             }
             else if (opcao == 2)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -299,7 +291,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             }
             else if (opcao == 3)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -317,7 +309,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             }
             else if (opcao == 4)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario vet = selecionarProfissional(consultores, quantidadeConsultores, 0, 1);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -342,7 +334,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
         case 2:
             opcao = 0;
             printf("-> Banho e Tosa: \n");
-            printf("1. Horarios disponiveis.\n");
+            printf("1. Horários disponíveis.\n");
             printf("2. Marcar Banho/Tosa.\n");
             printf("3. Desmarcar Banho/Tosa.\n");
             printf("4. Alterar Banho/Tosa.\n");
@@ -382,7 +374,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             }
             else if (opcao == 3)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -400,7 +392,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             }
             else if (opcao == 4)
             {
-                printf("Horarios disponiveis: \n");
+                printf("Horários disponíveis: \n");
                 Usuario tosador = selecionarProfissional(consultores, quantidadeConsultores, 1, 0);
                 Atendimento atendimentoBusca;
                 solicitarDiaDeAtendimento(&atendimentoBusca);
@@ -436,7 +428,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
             printf("Saindo do menu vendedor...\n");
             break;
         default:
-            printf("Opcao invalida!\n");
+            printf("Opção inválida!\n");
         }
         pausa();
         limparConsole();
@@ -456,7 +448,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
         printf("5. Consultar consultas por dia\n");
         printf("6. Atualizar minhas informações.\n");
         printf("7. Sair\n");
-        printf("Escolha uma opcao: ");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
         Atendimento *atendimentoBusca = (Atendimento *)malloc(sizeof(Atendimento));
         switch (opcao)
@@ -516,7 +508,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
             printf("Saindo do menu veterinário...\n");
             break;
         default:
-            printf("Opcao invalida!\n");
+            printf("Opção inválida!\n");
         }
         free(atendimentoBusca);
         pausa();
@@ -537,7 +529,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
         printf("5. Consultar consultas por dia\n");
         printf("6. Atualizar minhas informações.\n");
         printf("7. Sair\n");
-        printf("Escolha uma opcao: ");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
         Atendimento *atendimentoBusca = (Atendimento *)malloc(sizeof(Atendimento));
         switch (opcao)
@@ -597,7 +589,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
             printf("Saindo do menu banho/tosa...\n");
             break;
         default:
-            printf("Opcao invalida!\n");
+            printf("Opção inválida!\n");
         }
         free(atendimentoBusca);
         pausa();
@@ -614,7 +606,7 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
         printf("1. Gerenciar Funcionários\n");
         printf("2. Ver Relatórios\n");
         printf("3. Sair\n");
-        printf("Escolha uma opcao: ");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -707,7 +699,7 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             printf("Saindo do menu gerente...\n");
             break;
         default:
-            printf("Opcao invalida!\n");
+            printf("Opção inválida!\n");
         }
         pausa();
         limparConsole();
@@ -902,6 +894,7 @@ void liberarHash(Hash *ha)
                 {
                     atual = ha->usuarios[i];
                     ha->usuarios[i] = ha->usuarios[i]->prox;
+                    libera_ArvBin(atual->arvoreAtendimentos);
                     free(atual);
                 }
             }
@@ -1003,7 +996,7 @@ int validarEmail(Hash *ha, char *email)
     char *arroba = strchr(email, '@');
     if (arroba == NULL)
     {
-        printf("E email deve ter o caractere @.\n");
+        printf("O email deve ter o caractere @.\n");
         return 1;
     }
 
@@ -1432,7 +1425,7 @@ Usuario selecionarProfissional(Usuario *usuarios, int quantidade, int tosador, i
         }
         if (veterinario && usuarios[i].veterinario)
         {
-            printf("%d - Veterinario - %s\n", i + 1, usuarios[i].username);
+            printf("%d - Veterinário - %s\n", i + 1, usuarios[i].username);
         }
     }
     int escolha = 0;
@@ -1560,8 +1553,8 @@ int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
             //  0 Datas iguais;
             if (comparacao == 0)
             {
-                printf("Ja existe um atendimento neste dia!\n");
-                printf("Realize a alteracao ou a remocao para inserir.\n");
+                printf("Já existe um atendimento neste dia!\n");
+                printf("Realize a alteração ou a remoção para inserir.\n");
                 free(novo);
                 return 0; // Elemento já existe, não insere duplicado
             }
@@ -1681,9 +1674,9 @@ void libera_NO(struct NO *no)
 {
     if (no == NULL)
         return;
-
     libera_NO(no->esq);
     libera_NO(no->dir);
+    libera_FilaPrio(no->atendimento.consultas);
     free(no);
     no = NULL;
 }
@@ -1873,7 +1866,7 @@ int insere_FilaPrio(Consultas *fila_Consultas, int horario)
         return 0;
     if (fila_Consultas->qtd == MAX_ATENDIMENTOS)
     {
-        printf("\nEste dia de atendimentos esta lotado :c\n");
+        printf("\nEste dia de atendimentos está lotado :c\n");
         return 0;
     }
     fila_Consultas->qtd++;
@@ -1949,12 +1942,12 @@ int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * u
 {
     if (fila_Consultas == NULL)
     {
-        printf("Fila de consultas nao existe.\n");
+        printf("Fila de consultas não existe.\n");
         return 0;
     }
 
     // Exibe horários livres
-    printf("\nHorarios Preenchidos: ");
+    printf("\nHorários Preenchidos: ");
     int i, horarioEscolhido = -1;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
@@ -1964,13 +1957,13 @@ int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * u
         }
     }
     // Solicita ao usuário o horário para marcar
-    printf("\nInforme o horario que deseja agendar (1 a 8): ");
+    printf("\nInforme o horário que deseja agendar (1 a 8): ");
     scanf("%d", &horarioEscolhido);
 
     // Verifica se o horário está disponível
     if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") == 0 || fila_Consultas->consulta[horarioEscolhido - 1].concluida)
     {
-        printf("Horario inválido ou já agendado.\n");
+        printf("Horário inválido ou já agendado.\n");
         return 0;
     }
 
@@ -1989,7 +1982,7 @@ int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * u
     printf("Informe o telefone de contato: ");
     scanf(" %[^\n]s", novaConsulta.contatoResponsavel);
 
-    printf("Informe o endereco do tutor: ");
+    printf("Informe o endereço do tutor: ");
     scanf(" %[^\n]s", novaConsulta.enderecoResponsavel);
 
     printf("Informe o nome do animal: ");
@@ -2072,15 +2065,15 @@ void visualizar_FilaPrio(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
     {
-        printf("Fila de consultas esta vazia ou nao existe.\n");
+        printf("Fila de consultas está vazia ou no existe.\n");
         return;
     }
 
-    printf("Lista de proximas Consultas (por prioridade de horarios):\n");
+    printf("Lista de próximas Consultas (por prioridade de horários):\n");
     int i;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
-        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluida?: %d\n",
+        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluída?: %d\n",
                i + 1,
                fila_Consultas->consulta[i].horario,
                fila_Consultas->consulta[i].nomeTutor,
@@ -2109,12 +2102,12 @@ int atualizarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
     {
-        printf("Fila de consultas nao existe.\n");
+        printf("Fila de consultas não existe.\n");
         return 0;
     }
 
     // Exibe horários livres
-    printf("\nHorarios agendados: ");
+    printf("\nHorários agendados: ");
     int i, horarioEscolhido = -1;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
@@ -2125,13 +2118,13 @@ int atualizarConsulta(Consultas *fila_Consultas)
     }
 
     // Solicita ao usuário o horário para marcar
-    printf("\nInforme o horario que deseja agendar (1 a 8): ");
+    printf("\nInforme o horário que deseja agendar (1 a 8): ");
     scanf("%d", &horarioEscolhido);
 
     // Verifica se o horário está disponível
     if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") != 0)
     {
-        printf("Horario inválido, está livre ou concluído.\n");
+        printf("Horário inválido, está livre ou concluído.\n");
         return 0;
     }
 
@@ -2155,7 +2148,7 @@ int atualizarConsulta(Consultas *fila_Consultas)
     printf("Informe o porte do animal (1 - Pequeno, 2 - Médio, 3 - Grande): ");
     scanf("%d", &novaConsulta.porteAnimal);
 
-    printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
+    printf("É uma consulta veterinária? (1 - Sim, 0 - Não): ");
     scanf("%d", &novaConsulta.consultaVeterinaria);
 
     printf("É um banho? (1 - Sim, 0 - Não): ");
@@ -2173,7 +2166,7 @@ int atualizarConsulta(Consultas *fila_Consultas)
     // Atualiza o status da consulta e insere na fila
     strcpy(novaConsulta.status, "Agendado");
     fila_Consultas->consulta[horarioEscolhido - 1] = novaConsulta;
-    printf("Consulta atualizada com sucesso no horario %d!\n", horarioEscolhido);
+    printf("Consulta atualizada com sucesso no horário %d!\n", horarioEscolhido);
 
     return 1; // Sucesso
 }
@@ -2304,12 +2297,12 @@ int desmarcarConsulta(Consultas *fila_Consultas)
 {
     if (fila_Consultas == NULL)
     {
-        printf("\nFila de consultas nao existe.\n");
+        printf("\nFila de consultas não existe.\n");
         return 0;
     }
 
     // Exibe horários livres
-    printf("\nHorarios agendados:");
+    printf("\nHorários agendados:");
     int i, horarioEscolhido = -1;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
@@ -2320,13 +2313,13 @@ int desmarcarConsulta(Consultas *fila_Consultas)
     }
 
     // Solicita ao usuário o horário para marcar
-    printf("\nInforme o horario que deseja desmarcar (1 a 8): ");
+    printf("\nInforme o horário que deseja desmarcar (1 a 8): ");
     scanf("%d", &horarioEscolhido);
 
     // Verifica se o horário está disponível
     if (horarioEscolhido < 1 || horarioEscolhido > 8 || strcmp(fila_Consultas->consulta[horarioEscolhido - 1].status, "Agendado") != 0)
     {
-        printf("Horario inválido, está livre ou concluído.\n");
+        printf("Horário inválido, está livre ou concluído.\n");
         return 0;
     }
 
@@ -2345,7 +2338,7 @@ int desmarcarConsulta(Consultas *fila_Consultas)
     strcpy(fila_Consultas->consulta[horarioEscolhido - 1].detalhes, "Vazio");
     fila_Consultas->consulta[horarioEscolhido - 1].horario = horarioEscolhido; // Horários de 1 a 8
     fila_Consultas->consulta[horarioEscolhido - 1].concluida = 0;
-    printf("Consulta desmarcada com sucesso no horario %d!\n", horarioEscolhido);
+    printf("Consulta desmarcada com sucesso no horário %d!\n", horarioEscolhido);
     return 1; // Sucesso
 }
 
