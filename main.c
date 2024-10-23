@@ -75,7 +75,7 @@ void boasVindas();
 void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int quantidadeConsultores);
 void menuVeterinario(Hash *usuarios, Usuario *logado);
 void menuTosador(Hash *usuarios, Usuario *logado);
-void menuGerente(Hash *usuarios, Usuario *gerenteLogado);
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario * consultores, int quantidadeConsultores);
 int login(Hash *usuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
@@ -114,6 +114,7 @@ int estaVazia_ArvBin(Atendimentos *raiz);
 int consulta_ArvBin(Atendimentos *raiz, Atendimento *atendimento);
 void solicitarDiaDeAtendimento(Atendimento *atendimento);
 int remove_ArvBin(Atendimentos *raiz, int valor);
+float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int escopo);
 
 // Funções Heap|Consultas
 Consultas *cria_FilaPrio(); 
@@ -147,6 +148,7 @@ void pausa(){
         getchar();
     #endif
 }
+
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);
@@ -194,7 +196,9 @@ int main()
             }
             else if (usuarioLogado.gerente)
             {
-                menuGerente(Usuarios, &usuarioLogado);
+                int qntConsultores = 0;
+                Usuario *consultores = usuariosVeterinariosTosadores(Usuarios, &qntConsultores);
+                menuGerente(Usuarios, &usuarioLogado, consultores, qntConsultores);
             }
             else
             {
@@ -235,7 +239,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
     int opcao;
     do
     {
-        printf("\n=== Menu Vendedor ===\n");
+        printf("\n=== Menu Atendente ===\n");
         printf("1. Atendimento veterinário\n");
         printf("2. Banho/Tosa\n");
         printf("3. Atualizar minhas informações \n");
@@ -597,7 +601,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
     } while (opcao != 7);
 }
 
-void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario * consultores, int quantidadeConsultores)
 {
     int opcao;
     do
@@ -677,24 +681,42 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado)
             opcao = 0;
             printf("-> Visualização de relatórios:\n");
             printf("1. Relatório mensal.\n");
-            printf("2. Balanço total\n");
-            printf("3. voltar\n");
+            printf("2. voltar\n");
             scanf("%d", &opcao);
             if (opcao == 1)
             {
-                printf("Informe o mês de interesse:\n");
+                int mes, ano, escopo;
+                float balancoTotal = 0.0;
+                printf("Informe o mês(xx) e ano(xxxx) de interesse de interesse:");
+                scanf("%d %d",&mes, &ano);
+                if(mes>=1 && mes<=12 && ano > 0){
+                    printf("Escolha uma opção de relatório:\n");
+                    printf("0 - Incluir todas as consultas\n");
+                    printf("1 - Incluir apenas as consultas Veterinárias\n");
+                    printf("2 - Incluir apenas Banho/Tosa\n");
+                    printf("Opção: ");
+                    scanf("%d",&escopo);
+                    if(escopo>=0 && escopo <=2){
+                        int q;
+                        for(q=0;q<quantidadeConsultores;q++){
+                            balancoTotal += calculaRelatorioMensalTotal(consultores[q].arvoreAtendimentos, mes, ano, escopo);
+                        }
+                         printf("O resultado para %d/%d foi R$ %.2f\n", mes, ano, balancoTotal);
+                    }else{
+                        printf("Opção de relatório inválida, tente novamente.\n");
+                    }
+                }else{
+                    printf("Informe um mes/ano válidos\n");
+                }
                 break;
             }
             else if (opcao == 2)
             {
-                printf("Balanço total entre xx/xx/xxxx e xx/xx/xxxx: \n");
-                break;
-            }
-            else if (opcao == 3)
-            {
                 opcao = 0;
                 break;
             }
+            opcao = 0;
+            break;
         case 3:
             printf("Saindo do menu gerente...\n");
             break;
@@ -2385,4 +2407,51 @@ int estaVazia_FilaPrio(Consultas *fila_Consultas)
         return -1;
     }
     return (fila_Consultas->qtd == 0);
+}
+
+/**
+ * @brief Calcula o valor total das consultas de um determinado mês e ano, de acordo com o escopo especificado.
+ *
+ * Esta função percorre uma árvore binária de atendimentos, somando os valores das consultas concluídas 
+ * que atendem aos critérios de escopo fornecidos:
+ * - Escopo 0: Soma geral de todas as consultas concluídas.
+ * - Escopo 1: Soma apenas de consultas veterinárias concluídas.
+ * - Escopo 2: Soma apenas de consultas de banho ou tosa concluídas.
+ *
+ * @param raiz Ponteiro para a raiz da árvore de atendimentos.
+ * @param mes Mês para o qual o relatório será calculado.
+ * @param ano Ano para o qual o relatório será calculado.
+ * @param escopo Define o escopo do cálculo (0 = geral, 1 = consultas veterinárias, 2 = banho/tosa).
+ * @return A soma dos valores das consultas no mês e ano especificados, de acordo com o escopo.
+ */
+float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int escopo) {
+    if (raiz == NULL || *raiz == NULL)
+        return 0.0;
+
+    float somaValores = 0.0;
+    // Escopo 0 : Soma geral.
+    // Escopo 1 : Consulta Beterinária.
+    // Escopo 2 : Consulta Banho/Tosa.
+
+    if ((*raiz)->atendimento.mes == mes && (*raiz)->atendimento.ano == ano) {
+        // Verifica as consultas do atendimento no mês e ano solicitados
+        for (int i = 0; i < (*raiz)->atendimento.consultas->qtd; i++) {
+            Consulta consulta = (*raiz)->atendimento.consultas->consulta[i];
+            // Verifica se a consulta foi concluída
+            if ( consulta.concluida == 1 && consulta.consultaVeterinaria == 1 && escopo == 1) {
+                somaValores += consulta.valor;
+            }else if(consulta.concluida == 1 && (consulta.banho == 1 || consulta.tosa ==1) && escopo == 2){
+                somaValores += consulta.valor;
+            }
+            else if(consulta.concluida == 1 && escopo == 0){
+                somaValores += consulta.valor;
+            }
+        }
+    }
+
+    // Soma os valores das subárvores à esquerda e à direita
+    somaValores += calculaRelatorioMensalTotal(&((*raiz)->esq), mes, ano, escopo);
+    somaValores += calculaRelatorioMensalTotal(&((*raiz)->dir), mes, ano, escopo);
+
+    return somaValores;
 }
