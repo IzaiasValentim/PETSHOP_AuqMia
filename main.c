@@ -42,7 +42,6 @@ typedef struct atendimento
     Consultas *consultas;
 } Atendimento;
 
-
 typedef struct NO *Atendimentos;
 
 struct NO
@@ -75,7 +74,7 @@ void boasVindas();
 void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int quantidadeConsultores);
 void menuVeterinario(Hash *usuarios, Usuario *logado);
 void menuTosador(Hash *usuarios, Usuario *logado);
-void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario * consultores, int quantidadeConsultores);
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario *consultores, int quantidadeConsultores);
 int login(Hash *usuarios, Usuario *usuarioLogado);
 
 // Funções iniciais do Hash
@@ -117,36 +116,38 @@ int remove_ArvBin(Atendimentos *raiz, int valor);
 float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int escopo);
 
 // Funções Heap|Consultas
-Consultas *cria_FilaPrio(); 
+Consultas *cria_FilaPrio();
 void libera_FilaPrio(Consultas *fila_Consultas);
-int insere_FilaPrio(Consultas *fila_Consultas, int horario);      
-void validarFila(Consultas *fila_Consultas, int ultimo_Elemento); 
-int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * usernameProfissional);
-void consulta_FilaPrio(Consultas *fila_Consultas);  
-void visualizar_FilaPrio(Consultas *fila_Consultas); 
+int insere_FilaPrio(Consultas *fila_Consultas, int horario);
+void validarFila(Consultas *fila_Consultas, int ultimo_Elemento);
+int marcarConsulta(Consultas *fila_Consultas, char *usernameAtendente, char *usernameProfissional);
+void consulta_FilaPrio(Consultas *fila_Consultas);
+void visualizar_FilaPrio(Consultas *fila_Consultas);
 int atualizarConsulta(Consultas *fila_Consultas);
-int remove_FilaPrio(Consultas *fila_Consultas);            
-void rebaixarElemento(Consultas *fila_Consultas, int pai); 
-int realizarCheckin(Consultas *fila_Consultas);            
+int remove_FilaPrio(Consultas *fila_Consultas);
+void rebaixarElemento(Consultas *fila_Consultas, int pai);
+int realizarCheckin(Consultas *fila_Consultas);
 int desmarcarConsulta(Consultas *fila_Consultas);
-int estaCheia_FilaPrio(Consultas *fila_Consultas); 
-int estaVazia_FilaPrio(Consultas *fila_Consultas); 
+int estaCheia_FilaPrio(Consultas *fila_Consultas);
+int estaVazia_FilaPrio(Consultas *fila_Consultas);
 
-void limparConsole(){
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+void limparConsole()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
-void pausa(){
-    #ifdef _WIN32
-        system("pause");
-    #else
-        printf("Pressione uma tecla para continuar!");
-        getchar();
-    #endif
+void pausa()
+{
+#ifdef _WIN32
+    system("pause");
+#else
+    printf("Pressione uma tecla para continuar!");
+    getchar();
+#endif
 }
 
 int main()
@@ -215,7 +216,7 @@ int main()
         scanf("%d", &continuar);
         limparConsole();
     }
-    liberarHash(Usuarios);    
+    liberarHash(Usuarios);
     printf("Obrigado por usar o sistema Pet Shop. Até mais!\n");
     return 0;
 }
@@ -283,7 +284,7 @@ void menuVendedor(Hash *usuarios, Usuario *logado, Usuario *consultores, int qua
                 solicitarDiaDeAtendimento(&atendimentoBusca);
                 if (consulta_ArvBin(vet.arvoreAtendimentos, &atendimentoBusca))
                 {
-                    //strcpy(usuarioAtualizado.email, usuarioAntigo->email);
+                    // strcpy(usuarioAtualizado.email, usuarioAntigo->email);
                     marcarConsulta(atendimentoBusca.consultas, logado->username, vet.username);
                 }
                 else
@@ -446,7 +447,7 @@ void menuVeterinario(Hash *usuarios, Usuario *logado)
     {
         printf("=== Menu Veterinário ===\n");
         printf("1. Cadastrar dia de atendimento\n");
-        printf("2. Realizar checkin\n"); 
+        printf("2. Realizar checkin\n");
         printf("3. Visualizar atendimentos\n");
         printf("4. Visualizar consultas do dia\n");
         printf("5. Consultar consultas por dia\n");
@@ -601,7 +602,7 @@ void menuTosador(Hash *usuarios, Usuario *logado)
     } while (opcao != 7);
 }
 
-void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario * consultores, int quantidadeConsultores)
+void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario *consultores, int quantidadeConsultores)
 {
     int opcao;
     do
@@ -688,24 +689,31 @@ void menuGerente(Hash *usuarios, Usuario *gerenteLogado, Usuario * consultores, 
                 int mes, ano, escopo;
                 float balancoTotal = 0.0;
                 printf("Informe o mês(xx) e ano(xxxx) de interesse de interesse:");
-                scanf("%d %d",&mes, &ano);
-                if(mes>=1 && mes<=12 && ano > 0){
+                scanf("%d %d", &mes, &ano);
+                if (mes >= 1 && mes <= 12 && ano > 0)
+                {
                     printf("Escolha uma opção de relatório:\n");
                     printf("0 - Incluir todas as consultas\n");
                     printf("1 - Incluir apenas as consultas Veterinárias\n");
                     printf("2 - Incluir apenas Banho/Tosa\n");
                     printf("Opção: ");
-                    scanf("%d",&escopo);
-                    if(escopo>=0 && escopo <=2){
+                    scanf("%d", &escopo);
+                    if (escopo >= 0 && escopo <= 2)
+                    {
                         int q;
-                        for(q=0;q<quantidadeConsultores;q++){
+                        for (q = 0; q < quantidadeConsultores; q++)
+                        {
                             balancoTotal += calculaRelatorioMensalTotal(consultores[q].arvoreAtendimentos, mes, ano, escopo);
                         }
-                         printf("O resultado para %d/%d foi R$ %.2f\n", mes, ano, balancoTotal);
-                    }else{
+                        printf("O resultado para %d/%d foi R$ %.2f\n", mes, ano, balancoTotal);
+                    }
+                    else
+                    {
                         printf("Opção de relatório inválida, tente novamente.\n");
                     }
-                }else{
+                }
+                else
+                {
                     printf("Informe um mes/ano válidos\n");
                 }
                 break;
@@ -758,8 +766,8 @@ int login(Hash *usuarios, Usuario *usuarioLogado)
  * Função: criaHash
  * -----------------------
  * Cria e inicializa uma nova tabela hash para armazenar usuários.
- * Aloca memória para a estrutura Hash e para o array de ponteiros 
- * de usuários. Inicializa a quantidade de usuários para zero e 
+ * Aloca memória para a estrutura Hash e para o array de ponteiros
+ * de usuários. Inicializa a quantidade de usuários para zero e
  * define todos os ponteiros do array como NULL.
  *
  * @param TABLE_SIZE: o tamanho da tabela hash a ser criada.
@@ -1168,7 +1176,7 @@ int atualizarUsuario(Hash *ha, Usuario *usuarioAntigo)
         }
     }
     */
-    printf("Senha: ");
+    printf("Senha(obrigatório): ");
     scanf("%s", usuarioAtualizado.senha);
 
     int chave = chaveTabelaPorUsername(usuarioAntigo->username);
@@ -1425,7 +1433,7 @@ Usuario *usuariosVeterinariosTosadores(Hash *tabela, int *qtd_resultados)
 /**
  * Função: selecionarProfissional
  * -------------------------------
- * Exibe uma lista de profissionais (veterinários ou tosadores) com base 
+ * Exibe uma lista de profissionais (veterinários ou tosadores) com base
  * na quantidade fornecida e nas flags indicadoras de cada tipo de profissional.
  * O usuário pode selecionar um profissional a partir da lista exibida.
  *
@@ -1483,8 +1491,8 @@ Atendimentos *cria_ArvBin()
  *
  * @param a1: a primeira data a ser comparada.
  * @param a2: a segunda data a ser comparada.
- * @return: -1 se a1 é no passado em relação a a2, 
- *          1 se a1 é no futuro em relação a a2, 
+ * @return: -1 se a1 é no passado em relação a a2,
+ *          1 se a1 é no futuro em relação a a2,
  *          0 se as datas são iguais.
  */
 int comparaDatas(Atendimento a1, Atendimento a2)
@@ -1518,7 +1526,7 @@ int comparaDatas(Atendimento a1, Atendimento a2)
  * Função: setarDataNoAtendimento
  * -----------------------
  * Define a data atual no atendimento passado como parâmetro.
- * A data é obtida a partir do sistema e é armazenada nas 
+ * A data é obtida a partir do sistema e é armazenada nas
  * variáveis dia, mês e ano da estrutura Atendimento.
  *
  * @param atendimento: um ponteiro para a estrutura Atendimento
@@ -1539,9 +1547,9 @@ void setarDataNoAtendimento(Atendimento *atendimento)
  * Função: insere_ArvBin
  * -----------------------
  * Insere um novo atendimento na árvore binária de atendimentos.
- * Se a raiz da árvore estiver vazia, o novo atendimento se torna 
- * a raiz. Caso contrário, o novo atendimento é comparado com os 
- * existentes para determinar sua posição na árvore. Se já existir 
+ * Se a raiz da árvore estiver vazia, o novo atendimento se torna
+ * a raiz. Caso contrário, o novo atendimento é comparado com os
+ * existentes para determinar sua posição na árvore. Se já existir
  * um atendimento com a mesma data, a inserção não é realizada.
  *
  * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
@@ -1598,8 +1606,8 @@ int insere_ArvBin(Atendimentos *raiz, Atendimento atendimento)
  * Função: cadastrarAtendimento
  * ------------------------------
  * Cadastra um novo atendimento na árvore binária de atendimentos.
- * Solicita os dados do atendimento ao usuário, incluindo a data e o 
- * profissional responsável. Se o cadastro for bem-sucedido, 
+ * Solicita os dados do atendimento ao usuário, incluindo a data e o
+ * profissional responsável. Se o cadastro for bem-sucedido,
  * confirma a operação ao usuário.
  *
  * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
@@ -1665,8 +1673,8 @@ int totalNO_ArvBin(Atendimentos *raiz)
  * Função: preordem_ArvBin
  * ------------------------
  * Realiza uma travessia em pré-ordem na árvore binária de atendimentos.
- * Imprime o usuário responsável e a data de cada atendimento no formato 
- * "username - dia/mês/ano". A função visita o nó atual antes de 
+ * Imprime o usuário responsável e a data de cada atendimento no formato
+ * "username - dia/mês/ano". A função visita o nó atual antes de
  * percorrer as subárvores esquerda e direita.
  *
  * @param raiz: um ponteiro para a raiz da árvore de atendimentos.
@@ -1687,7 +1695,7 @@ void preordem_ArvBin(Atendimentos *raiz)
  * Função: libera_NO
  * ------------------
  * Libera a memória ocupada por um nó da árvore binária e suas subárvores.
- * A função é chamada recursivamente para liberar os nós da subárvore esquerda 
+ * A função é chamada recursivamente para liberar os nós da subárvore esquerda
  * e da subárvore direita antes de liberar o nó atual.
  *
  * @param no: um ponteiro para o nó da árvore a ser liberado.
@@ -1951,16 +1959,16 @@ void validarFila(Consultas *fila_Consultas, int ultimo_Elemento)
  *
  * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
  *                        os dados da fila de consultas.
- * 
+ *
  * @param usernameAtendente: ponteiro para uma cadeia de caracteres com o username
  *                           do atendente
- * 
+ *
  * @param usernameProfissional: ponteiro para uma cadeia de caracteres com o username
- *                           do profissional 
+ *                           do profissional
  *
  * @return 1 se a consulta foi agendada com sucesso, 0 se houve erro.
  */
-int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * usernameProfissional)
+int marcarConsulta(Consultas *fila_Consultas, char *usernameAtendente, char *usernameProfissional)
 {
     if (fila_Consultas == NULL)
     {
@@ -2015,12 +2023,26 @@ int marcarConsulta(Consultas *fila_Consultas, char * usernameAtendente, char * u
 
     printf("É uma consulta veterinaria? (1 - Sim, 0 - Não): ");
     scanf("%d", &novaConsulta.consultaVeterinaria);
+    if (novaConsulta.consultaVeterinaria == 1)
+    {
+        novaConsulta.banho = 0;
+        novaConsulta.tosa = 0;
+    }
+    else
+    {
+        printf("É um banho? (1 - Sim, 0 - Não): ");
+        scanf("%d", &novaConsulta.banho);
 
-    printf("É um banho? (1 - Sim, 0 - Não): ");
-    scanf("%d", &novaConsulta.banho);
-
-    printf("É uma tosa? (1 - Sim, 0 - Não): ");
-    scanf("%d", &novaConsulta.tosa);
+        printf("É uma tosa? (1 - Sim, 0 - Não): ");
+        scanf("%d", &novaConsulta.tosa);
+    }
+    if ((novaConsulta.consultaVeterinaria < 0 || novaConsulta.consultaVeterinaria > 1)
+                                 || ( novaConsulta.banho < 0 || novaConsulta.banho > 1) 
+                                 || ( novaConsulta.tosa < 0  || novaConsulta.tosa > 1 ))
+    {
+        printf("Opções inválidas para o tipo de consulta\n");
+        return 0;
+    }
 
     printf("Informe o valor da consulta: ");
     scanf("%f", &novaConsulta.valor);
@@ -2095,11 +2117,12 @@ void visualizar_FilaPrio(Consultas *fila_Consultas)
     int i;
     for (i = 0; i < MAX_ATENDIMENTOS; i++)
     {
-        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Status: %s, Concluída?: %d\n",
+        printf("Consulta %d - Horário: %d, Tutor: %s, Animal: %s, Valor: %.2f, Status: %s, Concluída?: %d\n",
                i + 1,
                fila_Consultas->consulta[i].horario,
                fila_Consultas->consulta[i].nomeTutor,
                fila_Consultas->consulta[i].nomeAnimal,
+               fila_Consultas->consulta[i].valor,
                fila_Consultas->consulta[i].status,
                fila_Consultas->consulta[i].concluida);
     }
@@ -2200,12 +2223,12 @@ int atualizarConsulta(Consultas *fila_Consultas)
  * e realiza o check-in. A consulta é marcada como concluída, a quantidade
  * de consultas na fila é decrementada, e o elemento mais prioritário
  * é rebaixado na estrutura de dados.
- * 
+ *
  * @param fp: ponteiro para a estrutura Consultas que contém os dados
  *            da fila de consultas.
- * 
- * @return: retorna 1 se o check-in foi realizado com sucesso, 
- *          e 0 se a fila está vazia, não existe, ou se ocorreu um erro 
+ *
+ * @return: retorna 1 se o check-in foi realizado com sucesso,
+ *          e 0 se a fila está vazia, não existe, ou se ocorreu um erro
  *          durante o check-in.
  */
 int remove_FilaPrio(Consultas *fp)
@@ -2238,11 +2261,11 @@ int remove_FilaPrio(Consultas *fp)
  * da heap mínima seja mantida. A função troca o elemento pai com o
  * filho de menor prioridade até que a posição do pai esteja correta
  * ou até que o elemento não tenha mais filhos.
- * 
+ *
  * @param fp: ponteiro para a estrutura Consultas que contém os dados
  *            da fila de consultas.
  * @param pai: índice do elemento pai que deve ser rebaixado na fila.
- * 
+ *
  * @return: Nenhum. A função modifica a estrutura da fila diretamente.
  */
 void rebaixarElemento(Consultas *fp, int pai)
@@ -2274,10 +2297,10 @@ void rebaixarElemento(Consultas *fp, int pai)
  * A função percorre a lista de consultas para encontrar a consulta
  * correspondente ao horário de prioridade mais alta e modifica seu
  * estado.
- * 
+ *
  * @param fila_Consultas: ponteiro para a estrutura Consultas que contém
  *                        os dados da fila de consultas.
- * 
+ *
  * @return: 1 se o check-in for realizado com sucesso; 0 se a fila
  *          de consultas estiver vazia ou nula.
  */
@@ -2412,7 +2435,7 @@ int estaVazia_FilaPrio(Consultas *fila_Consultas)
 /**
  * @brief Calcula o valor total das consultas de um determinado mês e ano, de acordo com o escopo especificado.
  *
- * Esta função percorre uma árvore binária de atendimentos, somando os valores das consultas concluídas 
+ * Esta função percorre uma árvore binária de atendimentos, somando os valores das consultas concluídas
  * que atendem aos critérios de escopo fornecidos:
  * - Escopo 0: Soma geral de todas as consultas concluídas.
  * - Escopo 1: Soma apenas de consultas veterinárias concluídas.
@@ -2424,7 +2447,8 @@ int estaVazia_FilaPrio(Consultas *fila_Consultas)
  * @param escopo Define o escopo do cálculo (0 = geral, 1 = consultas veterinárias, 2 = banho/tosa).
  * @return A soma dos valores das consultas no mês e ano especificados, de acordo com o escopo.
  */
-float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int escopo) {
+float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int escopo)
+{
     if (raiz == NULL || *raiz == NULL)
         return 0.0;
 
@@ -2433,18 +2457,24 @@ float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int esco
     // Escopo 1 : Consulta Beterinária.
     // Escopo 2 : Consulta Banho/Tosa.
 
-    if ((*raiz)->atendimento.mes == mes && (*raiz)->atendimento.ano == ano) {
+    if ((*raiz)->atendimento.mes == mes && (*raiz)->atendimento.ano == ano)
+    {
         // Verifica as consultas do atendimento no mês e ano solicitados
         int i;
-        for (i = 0; i < (*raiz)->atendimento.consultas->qtd; i++) {
+        for (i = 0; i < (*raiz)->atendimento.consultas->qtd; i++)
+        {
             Consulta consulta = (*raiz)->atendimento.consultas->consulta[i];
             // Verifica se a consulta foi concluída
-            if ( consulta.concluida == 1 && consulta.consultaVeterinaria == 1 && escopo == 1) {
-                somaValores += consulta.valor;
-            }else if(consulta.concluida == 1 && (consulta.banho == 1 || consulta.tosa ==1) && escopo == 2){
+            if (consulta.concluida == 1 && consulta.consultaVeterinaria == 1 && escopo == 1)
+            {
                 somaValores += consulta.valor;
             }
-            else if(consulta.concluida == 1 && escopo == 0){
+            else if (consulta.concluida == 1 && (consulta.banho == 1 || consulta.tosa == 1) && escopo == 2)
+            {
+                somaValores += consulta.valor;
+            }
+            else if (consulta.concluida == 1 && escopo == 0)
+            {
                 somaValores += consulta.valor;
             }
         }
