@@ -2435,7 +2435,8 @@ float calculaRelatorioMensalTotal(Atendimentos *raiz, int mes, int ano, int esco
 
     if ((*raiz)->atendimento.mes == mes && (*raiz)->atendimento.ano == ano) {
         // Verifica as consultas do atendimento no mês e ano solicitados
-        for (int i = 0; i < (*raiz)->atendimento.consultas->qtd; i++) {
+        int i;
+        for (i = 0; i < (*raiz)->atendimento.consultas->qtd; i++) {
             Consulta consulta = (*raiz)->atendimento.consultas->consulta[i];
             // Verifica se a consulta foi concluída
             if ( consulta.concluida == 1 && consulta.consultaVeterinaria == 1 && escopo == 1) {
